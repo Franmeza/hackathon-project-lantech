@@ -232,6 +232,10 @@ export async function trashGmailMessage(
   userId?: string
 ): Promise<void> {
   const auth = createOAuth2Client(accessToken, refreshToken, userId);
+  const { token } = await auth.getAccessToken();
+  if (!token) {
+    throw new Error("Unable to obtain Gmail access token");
+  }
   const gmail = google.gmail({ version: "v1", auth });
   await gmail.users.messages.trash({ userId: "me", id: messageId });
 }

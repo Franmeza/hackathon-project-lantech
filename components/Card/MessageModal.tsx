@@ -56,6 +56,7 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
   );
   const [visible, setVisible] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [archiving, setArchiving] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
 
@@ -66,9 +67,21 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
 
   async function handleDelete() {
     setDeleting(true);
-    await fetch(`/api/cards?id=${card.id}`, { method: "DELETE" }).catch(() => {});
-    onDeleted?.();
-    handleClose();
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/cards?id=${card.id}`, { method: "DELETE" });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setDeleteError(data.error ?? "Could not delete this message.");
+        return;
+      }
+      onDeleted?.();
+      handleClose();
+    } catch {
+      setDeleteError("Network error — please try again.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function handleArchive() {
@@ -250,6 +263,15 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
 
         {/* ── Body ── */}
         <div className="flex-1 overflow-y-auto px-6 py-5 scroll-smooth">
+
+          {deleteError && (
+            <div className="mb-4 flex items-center gap-2 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              {deleteError}
+            </div>
+          )}
 
           {state.status === "loading" && <SkeletonBody />}
 

@@ -148,23 +148,62 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Trash linked Gmail messages in parallel; failures are non-fatal
-  const tokens = await getAccountTokens(session.user.id);
-  if (tokens?.accessToken) {
-    await Promise.all(
-      cards
-        .filter((c) => c.gmailMsgId)
-        .map((c) =>
-          trashGmailMessage(
-            c.gmailMsgId!,
-            tokens.accessToken,
-            tokens.refreshToken ?? undefined,
-            session.user.id
-          ).catch((err) =>
-            console.error(`Failed to trash Gmail message ${c.gmailMsgId}:`, err)
-          )
+  const linked = cards.filter(
+    (c): c is { id: string; gmailMsgId: string } => Boolean(c.gmailMsgId)
+  );
+
+  if (linked.length > 0) {
+    const tokens = await getAccountTokens(session.user.id);
+    if (!tokens?.accessToken) {
+      return NextResponse.json(
+        {
+          error:
+            "Gmail not connected. Sign out and sign in again to grant mail permissions.",
+        },
+        { status: 403 }
+      );
+    }
+
+    const results = await Promise.allSettled(
+      linked.map((c) =>
+        trashGmailMessage(
+          c.gmailMsgId,
+          tokens.accessToken,
+          tokens.refreshToken ?? undefined,
+          session.user.id
         )
+      )
     );
+
+    const failures = results.filter((r) => r.status === "rejected");
+    if (failures.length > 0) {
+      for (let i = 0; i < results.length; i++) {
+        const r = results[i];
+        if (r.status === "rejected") {
+          console.error(
+            `Failed to trash Gmail message ${linked[i].gmailMsgId}:`,
+            r.reason
+          );
+        }
+      }
+
+      const reasons = failures.map((f) =>
+        f.status === "rejected" ? String(f.reason) : ""
+      );
+      const insufficientScope = reasons.some((r) =>
+        /insufficient|403|permission|scope|denied/i.test(r)
+      );
+
+      return NextResponse.json(
+        {
+          error: insufficientScope
+            ? "Missing Gmail permission to delete. Sign out and sign in again."
+            : "Failed to move message(s) to Gmail trash. The card was not removed.",
+          gmailFailed: failures.length,
+        },
+        { status: 502 }
+      );
+    }
   }
 
   await prisma.card.deleteMany({ where: { id: { in: cards.map((c) => c.id) } } });
