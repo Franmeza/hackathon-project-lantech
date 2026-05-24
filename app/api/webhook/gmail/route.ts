@@ -8,6 +8,10 @@ import {
 import { classifyEmail } from "@/lib/openai";
 import { formatRelativeTime } from "@/lib/utils";
 
+// Tell Vercel to allow up to 60 seconds for this function (requires Pro for >10s,
+// but on Hobby the max is 60s on Edge — we stay in Node.js and cap at 60s)
+export const maxDuration = 60;
+
 interface PubSubMessage {
   message?: {
     data?: string;
@@ -22,8 +26,6 @@ interface GmailNotification {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  // Acknowledge Pub/Sub immediately — must respond within 10s on Vercel Hobby.
-  // Processing runs in the background via waitUntil so the response isn't held.
   let body: PubSubMessage;
   try {
     body = (await req.json()) as PubSubMessage;
@@ -31,58 +33,35 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: true });
   }
 
-  const process = processNotification(body);
-
-  // waitUntil keeps the function alive after the response is sent (Vercel/Next.js)
-  // Falls back gracefully if the API isn't available (e.g. local dev)
-  if (typeof (globalThis as Record<string, unknown>).EdgeRuntime === "undefined") {
-    // Node.js runtime — fire and forget
-    process.catch((err: unknown) => console.error("Webhook processing error:", err));
-  }
-
-  return NextResponse.json({ ok: true });
-}
-
-async function processNotification(body: PubSubMessage): Promise<void> {
   try {
     const encodedData = body?.message?.data;
+    if (!encodedData) return NextResponse.json({ ok: true });
 
-    if (!encodedData) {
-      return;
-    }
-
-    // Pub/Sub messages are base64-encoded JSON
     const notification = JSON.parse(
       Buffer.from(encodedData, "base64").toString("utf-8")
     ) as GmailNotification;
 
     const { emailAddress, historyId } = notification;
+    if (!emailAddress || !historyId) return NextResponse.json({ ok: true });
 
-    if (!emailAddress || !historyId) {
-      return;
-    }
-
-    // Find the user by email
     const user = await prisma.user.findUnique({
       where: { email: emailAddress },
       select: { id: true },
     });
 
     if (!user) {
-      console.warn(`Received webhook for unknown user: ${emailAddress}`);
-      return;
+      console.warn(`Webhook: unknown user ${emailAddress}`);
+      return NextResponse.json({ ok: true });
     }
 
-    // Get OAuth tokens for this user
     const tokens = await getAccountTokens(user.id);
     if (!tokens) {
-      console.error(`No tokens found for user ${user.id}`);
-      return;
+      console.error(`Webhook: no tokens for user ${user.id}`);
+      return NextResponse.json({ ok: true });
     }
 
     const startHistoryId = tokens.historyId ?? historyId;
 
-    // Fetch new message IDs since last known history
     const messageIds = await getNewMessageIds(
       startHistoryId,
       tokens.accessToken,
@@ -90,9 +69,7 @@ async function processNotification(body: PubSubMessage): Promise<void> {
       user.id
     );
 
-    // Process each new message
     for (const msgId of messageIds) {
-      // Skip if already processed
       const existing = await prisma.card.findUnique({
         where: { gmailMsgId: msgId },
       });
@@ -129,16 +106,18 @@ async function processNotification(body: PubSubMessage): Promise<void> {
           },
         });
       } catch (err) {
-        console.error(`Failed to process message ${msgId}:`, err);
+        console.error(`Webhook: failed to process message ${msgId}:`, err);
       }
     }
 
-    // Update the stored historyId to the latest one
     await prisma.account.updateMany({
       where: { userId: user.id, provider: "google" },
       data: { gmailHistoryId: String(historyId) },
     });
+
+    return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Gmail webhook error:", err);
+    console.error("Webhook error:", err);
+    return NextResponse.json({ ok: true });
   }
 }
