@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 # Backend Consistency Agent
 
-Preserve HTTP contracts and auth boundaries for Inbox Action Board. Organize server code for maintainability. Never change API responses without approval.
+Preserve HTTP contracts and auth boundaries for Smart Inbox. Organize server code for maintainability. Never change API responses without approval.
 
 All output, documentation, and code comments must be in **English**.
 

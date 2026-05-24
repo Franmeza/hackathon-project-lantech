@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import { APP_NAME } from "@/lib/brand";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { sidebarLayout } from "@/lib/ui-tokens";
 
 interface SidebarBrandProps {
@@ -13,25 +14,16 @@ export function SidebarBrand({ isExpanded, onClick }: SidebarBrandProps) {
     <button
       type="button"
       onClick={onClick}
-      title="Inbox AI"
-      aria-label="Inbox AI home"
+      title={APP_NAME}
+      aria-label={`${APP_NAME} home`}
       className={
         sidebarLayout.brand +
-        (isExpanded ? "" : " " + sidebarLayout.brandCollapsed)
+        (isExpanded ? " " + sidebarLayout.brandExpanded : " " + sidebarLayout.brandCollapsed)
       }
     >
-      <span className={sidebarLayout.brandLogoWrap}>
-        <Image
-          src="/smart-inbox-logo-transparent.svg"
-          alt=""
-          width={32}
-          height={32}
-          className={sidebarLayout.brandLogo}
-          priority
-        />
-      </span>
+      <BrandMark iconClassName={sidebarLayout.brandIcon} />
       {isExpanded && (
-        <span className={sidebarLayout.brandLabel}>Inbox AI</span>
+        <span className={sidebarLayout.brandLabel}>{APP_NAME}</span>
       )}
     </button>
   );

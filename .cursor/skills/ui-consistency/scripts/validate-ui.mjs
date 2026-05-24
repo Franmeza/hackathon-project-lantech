@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * UI consistency validator for Inbox Action Board.
+ * UI consistency validator for Smart Inbox.
  * Usage: node .cursor/skills/ui-consistency/scripts/validate-ui.mjs
  */
 

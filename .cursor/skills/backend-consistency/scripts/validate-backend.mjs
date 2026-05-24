@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Backend consistency validator for Inbox Action Board.
+ * Backend consistency validator for Smart Inbox.
  * Usage: node .cursor/skills/backend-consistency/scripts/validate-backend.mjs
  */
 

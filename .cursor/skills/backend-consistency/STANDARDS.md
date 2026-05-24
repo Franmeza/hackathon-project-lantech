@@ -1,4 +1,4 @@
-# Backend Standards — Inbox Action Board
+# Backend Standards — Smart Inbox
 
 Source of truth extracted from the current codebase. New backend work must align with these patterns unless a confirmed Change Proposal explicitly changes a contract.
 

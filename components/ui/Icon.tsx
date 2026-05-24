@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import {
   IconArchive,
   IconBell,
+  IconBolt,
   IconBrandGoogle,
   IconBulb,
   IconChevronLeft,
@@ -9,11 +10,16 @@ import {
   IconClock,
   IconInbox,
   IconLayoutSidebar,
+  IconLoader2,
+  IconLock,
   IconLogout,
   IconMail,
+  IconMailAi,
   IconMessageReply,
   IconReceipt,
+  IconRobot,
   IconSparkles,
+  IconTrash,
   type IconProps as TablerIconProps,
 } from "@tabler/icons-react";
 import { iconSizes } from "@/lib/ui-tokens";
@@ -21,6 +27,7 @@ import { iconSizes } from "@/lib/ui-tokens";
 export type IconName =
   | "archive"
   | "bell"
+  | "bolt"
   | "brand-google"
   | "bulb"
   | "chevron-left"
@@ -28,11 +35,16 @@ export type IconName =
   | "clock"
   | "inbox"
   | "layout-sidebar"
+  | "loader"
+  | "lock"
   | "logout"
   | "mail"
+  | "mail-ai"
   | "message-reply"
   | "receipt"
-  | "sparkles";
+  | "robot"
+  | "sparkles"
+  | "trash";
 
 export type IconSize = keyof typeof iconSizes;
 
@@ -44,6 +56,7 @@ const ICON_MAP: Record<
 > = {
   archive: IconArchive,
   bell: IconBell,
+  bolt: IconBolt,
   "brand-google": IconBrandGoogle,
   bulb: IconBulb,
   "chevron-left": IconChevronLeft,
@@ -51,11 +64,16 @@ const ICON_MAP: Record<
   clock: IconClock,
   inbox: IconInbox,
   "layout-sidebar": IconLayoutSidebar,
+  loader: IconLoader2,
+  lock: IconLock,
   logout: IconLogout,
   mail: IconMail,
+  "mail-ai": IconMailAi,
   "message-reply": IconMessageReply,
   receipt: IconReceipt,
+  robot: IconRobot,
   sparkles: IconSparkles,
+  trash: IconTrash,
 };
 
 const TILE_ICON: Record<TileIconId, IconName> = {

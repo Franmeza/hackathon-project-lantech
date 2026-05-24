@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 # UI Consistency Agent
 
-Preserve the exact look and feel of Inbox Action Board. Organize code for maintainability. Never propose visual improvements.
+Preserve the exact look and feel of Smart Inbox. Organize code for maintainability. Never propose visual improvements.
 
 All output, documentation, and code comments must be in **English**.
 

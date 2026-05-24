@@ -49,17 +49,19 @@ export function ArchiveView({
             {archived.length} {archived.length === 1 ? "card" : "cards"}
           </span>
 
-          <div className="ml-auto flex items-center gap-2 shrink-0">
-            {!selectionMode ? (
-              <Button variant="toolbar" onClick={onEnterSelection}>
-                Select
-              </Button>
-            ) : (
-              <Button variant="toolbar" onClick={onExitSelection}>
-                Cancel
-              </Button>
-            )}
-          </div>
+          {archived.length > 0 && (
+            <div className="ml-auto flex items-center gap-2 shrink-0">
+              {!selectionMode ? (
+                <Button variant="toolbar" onClick={onEnterSelection}>
+                  Select
+                </Button>
+              ) : (
+                <Button variant="toolbar" onClick={onExitSelection}>
+                  Cancel
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

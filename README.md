@@ -1,4 +1,4 @@
-# Inbox Action Board
+# Smart Inbox
 
 > AI-powered Gmail triage — know what needs your attention before you open a single email.
 
@@ -12,7 +12,7 @@ Professionals spend 28% of their workweek managing email. The cognitive load of 
 
 ## Solution
 
-Inbox Action Board connects to your Gmail account and automatically classifies every incoming email using GPT-5-mini. Emails are grouped into four categories on a visual dashboard:
+Smart Inbox connects to your Gmail account and automatically classifies every incoming email using GPT-5-mini. Emails are grouped into four categories on a visual dashboard:
 
 | Category | What it means |
 |---|---|

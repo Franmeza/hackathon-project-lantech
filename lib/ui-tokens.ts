@@ -133,12 +133,15 @@ export const sidebarLayout = {
   expandedWidth: "w-44",
   collapsedWidth: "w-14",
   brand:
-    "w-full flex items-center gap-2.5 px-2.5 pt-3 pb-2 text-left transition-colors hover:opacity-90",
-  brandCollapsed: "justify-center px-2",
+    "w-full flex items-center justify-center gap-2 px-2 py-3 transition-colors hover:opacity-90",
+  brandExpanded: "flex-row",
+  brandCollapsed: "flex-row",
   brandLogoWrap:
-    "h-8 w-8 flex items-center justify-center shrink-0 overflow-hidden",
+    "h-8 w-8 flex items-center justify-center shrink-0",
+  brandIcon: "text-zinc-100",
   brandLogo: "h-7 w-7 object-contain",
-  brandLabel: "text-[13px] font-semibold text-zinc-100 truncate leading-none",
+  brandLabel:
+    "text-[13px] font-semibold text-zinc-100 truncate leading-none text-center",
   navList: "flex flex-col gap-1 px-2 pt-1 w-full",
   navButtonBase:
     "relative rounded-xl flex items-center transition-colors",
@@ -317,4 +320,49 @@ export const summaryTileLayout = {
   titleText: dashboardTileLayout.categoryTitle,
   subtitle: dashboardTileLayout.categorySubtitle,
   footer: dashboardTileLayout.categoryFooter,
+} as const;
+
+/** Sign-in page — marketing panel + login card */
+export const signIn = {
+  shell: "min-h-screen flex flex-col lg:flex-row",
+  heroShell:
+    "w-full lg:w-2/3 flex flex-col justify-between relative overflow-hidden p-6 sm:p-8 lg:p-12 shrink-0 min-h-[52vh] lg:min-h-screen",
+  heroPanel: "bg-[#0B0C0E]",
+  heroGrid: "sign-in-hero-grid absolute inset-0 pointer-events-none",
+  heroGlow:
+    "absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none",
+  heroBrandWrap: "relative flex items-center gap-2.5 z-[1]",
+  heroBrandName: "text-white font-semibold text-[15px] tracking-tight",
+  heroBrandTagline: "text-[11px] text-white/40 font-medium -mt-0.5",
+  heroBrandText: "flex flex-col min-w-0",
+  heroContent: "relative z-[1] mt-8 lg:mt-0",
+  heroBadge:
+    "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/50 text-xs font-medium mb-5 lg:mb-8",
+  heroBadgeDot: "w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block",
+  heroTitle:
+    "text-[28px] sm:text-[36px] lg:text-[46px] font-bold text-white leading-[1.07] tracking-tight mb-4 lg:mb-6",
+  heroGradientText:
+    "bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent",
+  heroDescription:
+    "text-[14px] sm:text-[15px] text-white/45 leading-relaxed max-w-md mb-6 lg:mb-10",
+  heroFeatureGrid: "grid grid-cols-1 sm:grid-cols-2 gap-3",
+  heroFeatureCard:
+    "flex gap-3 p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.07]",
+  heroFeatureIcon: "text-white/70 shrink-0 mt-0.5",
+  heroFeatureTitle: "text-[13px] font-medium text-white/80 leading-tight",
+  heroFeatureDesc: "text-[12px] text-white/35 mt-0.5 leading-snug",
+  heroFooter: "relative text-[11px] text-white/20 z-[1] mt-6 lg:mt-0",
+  loginShell: "w-full lg:w-1/3 flex flex-col items-center justify-center flex-1",
+  loginPanel: "flex flex-col items-center justify-center px-6 sm:px-8 py-8 lg:py-12 w-full",
+  loginCard: "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden",
+  loginCardBody: "px-8 pt-8 pb-6",
+  loginCardTitle: "text-[22px] font-bold text-gray-900 tracking-tight mb-1",
+  loginCardSubtitle: "text-[13px] text-gray-500 leading-relaxed mb-7",
+  loginTrustFooter: "border-t border-gray-100 px-8 py-4 bg-gray-50/60",
+  loginTrustGrid: "flex items-center justify-between",
+  loginTrustItem: "flex flex-col items-center gap-1",
+  loginTrustLabel: "text-[10px] text-gray-400 font-medium",
+  loginLegal: "text-center text-[11px] text-gray-400 mt-5 leading-relaxed",
+  googleButton:
+    "w-full flex items-center justify-center gap-3 text-[13px] font-semibold px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100",
 } as const;

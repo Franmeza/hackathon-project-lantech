@@ -1,4 +1,4 @@
-# UI Standards — Inbox Action Board
+# UI Standards — Smart Inbox
 
 Source of truth extracted from the existing codebase. Do not invent new values.
 

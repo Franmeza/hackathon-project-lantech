@@ -49,12 +49,7 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
   const detailCards = detailTile
     ? activeCards.filter((c) => detailTile.cols.includes(c.col))
     : [];
-  const showHeaderArchiveAll =
-    Boolean(detailTileId) &&
-    detailCards.length > 0 &&
-    (detailTileId === "sub" ||
-      detailTileId === "other" ||
-      detailTileId === "invoice");
+  const showDetailBulkActions = Boolean(detailTileId) && detailCards.length > 0;
 
   function onDragStart(e: React.DragEvent, id: string) {
     draggingId.current = id;
@@ -196,15 +191,6 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     else await runBulk(action);
   }
 
-  async function handleQuickArchiveIds(ids: string[]) {
-    const title = `Archive ${ids.length} items?`;
-    const description = "These items will move to Archive. You can restore them later.";
-    const action = async () => {
-      await bulkArchive({ ids });
-    };
-    requestConfirm(title, description, action);
-  }
-
   return (
     <div className="flex min-h-screen w-full font-sans">
       <Sidebar
@@ -291,27 +277,27 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
                 {detailCards.length} emails
               </span>
 
-              <div className="ml-auto flex items-center gap-2 shrink-0">
-                {!selection.selectionMode ? (
-                  <>
-                    <Button variant="toolbar" onClick={selection.enterMode}>
-                      Select
-                    </Button>
-                    {showHeaderArchiveAll && (
+              {showDetailBulkActions && (
+                <div className="ml-auto flex items-center gap-2 shrink-0">
+                  {!selection.selectionMode ? (
+                    <>
+                      <Button variant="toolbar" onClick={selection.enterMode}>
+                        Select
+                      </Button>
                       <Button
                         variant="toolbar"
                         onClick={() => void handleQuickArchiveAll(detailTileId)}
                       >
                         Archive all
                       </Button>
-                    )}
-                  </>
-                ) : (
-                  <Button variant="toolbar" onClick={selection.exitMode}>
-                    Cancel
-                  </Button>
-                )}
-              </div>
+                    </>
+                  ) : (
+                    <Button variant="toolbar" onClick={selection.exitMode}>
+                      Cancel
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
 
             {detailTileId === "action" ? (
@@ -324,7 +310,6 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
                 selectionMode={selection.selectionMode}
                 isSelected={selection.isSelected}
                 onToggleSelect={selection.toggle}
-                onArchiveGroup={(ids) => handleQuickArchiveIds(ids)}
               />
             ) : (
               <div

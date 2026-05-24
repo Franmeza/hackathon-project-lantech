@@ -1,5 +1,7 @@
 import type { Card } from "@/types";
 
+export const DASHBOARD_TILE_PREVIEW_LIMIT = 3;
+
 export type ActionUrgency = "overdue" | "today" | "upcoming";
 
 export function isTodayDeadline(deadline: string): boolean {

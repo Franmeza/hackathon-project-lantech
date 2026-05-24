@@ -2,6 +2,7 @@
 
 import type { Card, TileDefinition } from "@/types";
 import { COL_CONFIG } from "@/lib/col-config";
+import { DASHBOARD_TILE_PREVIEW_LIMIT } from "@/lib/dashboard-utils";
 import { DotIndicator } from "@/components/ui/DotIndicator";
 import { TileIcon, type TileIconId } from "@/components/ui/Icon";
 import { Pill } from "@/components/ui/Pill";
@@ -17,7 +18,7 @@ interface CategoryTileProps {
   onClick: (tileId: string) => void;
 }
 
-const PREVIEW_LIMIT = 3;
+const PREVIEW_LIMIT = DASHBOARD_TILE_PREVIEW_LIMIT;
 
 export function CategoryTile({ tile, cards, onClick }: CategoryTileProps) {
   const primaryCol = tile.cols[0];

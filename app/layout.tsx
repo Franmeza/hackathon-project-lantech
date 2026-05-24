@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -9,7 +10,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Inbox AI — Gmail triage, automated",
+  title: `${APP_NAME} — ${APP_TAGLINE}`,
   description: "AI reads every new Gmail and routes it to action items, invoices, subscriptions, or FYI. Built with Next.js and GPT-5-mini.",
 };
 

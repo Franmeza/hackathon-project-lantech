@@ -10,6 +10,7 @@ import {
 } from "@/lib/ui-tokens";
 import {
   countActionGroups,
+  DASHBOARD_TILE_PREVIEW_LIMIT,
   getActionUrgency,
   getInitials,
   sortByUrgency,
@@ -22,7 +23,7 @@ interface ActionHeroTileProps {
   onClick: () => void;
 }
 
-const PREVIEW_LIMIT = 5;
+const PREVIEW_LIMIT = DASHBOARD_TILE_PREVIEW_LIMIT;
 
 function StatCounter({
   count,
