@@ -14,7 +14,7 @@ export const env = {
   googleClientId: required("GOOGLE_CLIENT_ID"),
   googleClientSecret: required("GOOGLE_CLIENT_SECRET"),
   nextAuthSecret: required("NEXTAUTH_SECRET"),
-  nextAuthUrl: required("NEXTAUTH_URL"),
+  nextAuthUrl: process.env.NEXTAUTH_URL,
   googlePubsubTopic: process.env.GOOGLE_PUBSUB_TOPIC,
   databaseUrl: process.env.DATABASE_URL,
   directUrl: process.env.DIRECT_URL,

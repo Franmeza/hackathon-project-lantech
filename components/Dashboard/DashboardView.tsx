@@ -66,84 +66,33 @@ export function DashboardView({
     TILE_DEFINITIONS.find((t) => t.id === id)
   ).filter((t): t is NonNullable<typeof t> => t !== undefined);
 
-  const stats = [
-    {
-      label: "Action required",
-      count: activeCards.filter((c) => ["action", "overdue"].includes(c.col)).length,
-      color: "text-red-600",
-      bg: "bg-red-50 border-red-200",
-    },
-    {
-      label: "Invoices",
-      count: activeCards.filter((c) => c.col === "invoice").length,
-      color: "text-amber-600",
-      bg: "bg-amber-50 border-amber-200",
-    },
-    {
-      label: "Subscriptions",
-      count: activeCards.filter((c) => c.col === "sub").length,
-      color: "text-blue-600",
-      bg: "bg-blue-50 border-blue-200",
-    },
-    {
-      label: "FYI",
-      count: activeCards.filter((c) => c.col === "other").length,
-      color: "text-violet-600",
-      bg: "bg-violet-50 border-violet-200",
-    },
-  ].filter((s) => s.count > 0);
-
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            {userEmail && (
-              <div
-                className={`w-7 h-7 rounded-full ${avatarBg} flex items-center justify-center flex-shrink-0`}
-              >
-                <span className="text-white text-[11px] font-bold">{avatarLetter}</span>
-              </div>
-            )}
-            <h1 className={typography.pageTitle}>
-              {greeting}
-              {firstName ? `, ${firstName}` : ""}
-            </h1>
-            {totalEmails > 0 && (
-              <span className={functionalColors.emailCount}>{totalEmails} emails</span>
-            )}
-          </div>
-          <p className={typography.meta + (userEmail ? " ml-9" : "")}>
-            {totalEmails === 0
-              ? "Your inbox is clear — nice work."
-              : urgentCount > 0
-                ? `${urgentCount} overdue item${urgentCount === 1 ? "" : "s"} need${urgentCount === 1 ? "s" : ""} your attention.`
-                : `${totalEmails} email${totalEmails === 1 ? "" : "s"} to review.`}
-          </p>
-        </div>
-        {userEmail && (
-          <span
-            className="text-[11px] text-gray-400 hidden md:inline border border-gray-200 rounded-lg px-2.5 py-1 bg-white"
-            title={userEmail}
-          >
-            {userEmail}
-          </span>
-        )}
-      </div>
-
-      {stats.length > 0 && (
-        <div className="flex gap-3 flex-wrap">
-          {stats.map((stat) => (
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          {userEmail && (
             <div
-              key={stat.label}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${stat.bg} ${stat.color}`}
+              className={`w-7 h-7 rounded-full ${avatarBg} flex items-center justify-center flex-shrink-0`}
             >
-              <span className="font-bold tabular-nums">{stat.count}</span>
-              <span className="font-medium opacity-70">{stat.label}</span>
+              <span className="text-white text-[11px] font-bold">{avatarLetter}</span>
             </div>
-          ))}
+          )}
+          <h1 className={typography.pageTitle}>
+            {greeting}
+            {firstName ? `, ${firstName}` : ""}
+          </h1>
+          {totalEmails > 0 && (
+            <span className={functionalColors.emailCount}>{totalEmails} emails</span>
+          )}
         </div>
-      )}
+        <p className={typography.meta + (userEmail ? " ml-9" : "")}>
+          {totalEmails === 0
+            ? "Your inbox is clear — nice work."
+            : urgentCount > 0
+              ? `${urgentCount} overdue item${urgentCount === 1 ? "" : "s"} need${urgentCount === 1 ? "s" : ""} your attention.`
+              : `${totalEmails} email${totalEmails === 1 ? "" : "s"} to review.`}
+        </p>
+      </div>
 
       <PasteMessage onExtracted={onExtracted} fullWidth />
 
