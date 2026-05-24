@@ -11,7 +11,8 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: `${APP_NAME} — ${APP_TAGLINE}`,
-  description: "AI reads every new Gmail and routes it to action items, invoices, subscriptions, or FYI. Built with Next.js and GPT-5-mini.",
+  description:
+    "AI reads every new Gmail and routes it to action items, invoices, subscriptions, or FYI. Built with Next.js and GPT-5-mini.",
 };
 
 export default function RootLayout({

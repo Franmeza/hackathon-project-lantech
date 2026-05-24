@@ -1,21 +1,16 @@
-import { Icon, type IconSize } from "@/components/ui/Icon";
+import { Icon } from "@/components/ui/Icon";
 
 interface BrandMarkProps {
   iconClassName?: string;
-  size?: IconSize;
 }
 
-export function BrandMark({
-  iconClassName = "",
-  size = "sm",
-}: BrandMarkProps) {
+export function BrandMark({ iconClassName = "" }: BrandMarkProps) {
   return (
     <div
-      className="flex items-center justify-center gap-0.5 h-8 w-8 shrink-0"
+      className="flex items-center justify-center h-8 w-8 shrink-0"
       aria-hidden="true"
     >
-      <Icon name="robot" size={size} className={iconClassName} />
-      <Icon name="mail-ai" size={size} className={iconClassName} />
+      <Icon name="mail-ai" size="brandLogo" className={iconClassName} />
     </div>
   );
 }

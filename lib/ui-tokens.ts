@@ -38,6 +38,7 @@ export const iconSizes = {
   sm: 16,
   md: 18,
   lg: 20,
+  brandLogo: 28,
 } as const;
 
 /** Functional color presets — not tied to email categories */
