@@ -5,6 +5,10 @@ import { registerGmailWatch, getAccountTokens } from "@/lib/gmail";
 import { env } from "@/lib/env";
 
 export async function GET(): Promise<NextResponse> {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });

@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { serializeCard } from "@/lib/card-serializer";
 import { surfaces } from "@/lib/ui-tokens";
 import { prisma } from "@/lib/db";
 import { InboxBoard } from "@/components/Board/InboxBoard";
@@ -11,20 +12,7 @@ async function getUserCards(userId: string): Promise<Card[]> {
     orderBy: { createdAt: "desc" },
   });
 
-  return cards.map((c) => ({
-    id: c.id,
-    col: c.col as Card["col"],
-    sender: c.sender,
-    senderType: c.senderType as Card["senderType"],
-    time: c.time,
-    task: c.task,
-    reason: c.reason,
-    deadline: c.deadline,
-    reply: c.reply,
-    archived: c.archived,
-    gmailMsgId: c.gmailMsgId,
-    createdAt: c.createdAt.toISOString(),
-  }));
+  return cards.map(serializeCard);
 }
 
 export default async function HomePage() {

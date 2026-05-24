@@ -1,27 +1,12 @@
 "use client";
 
 import type { Card } from "@/types";
-import { layout } from "@/lib/ui-tokens";
+import { SENDER_TYPE_BADGE, SENDER_TYPE_LABEL } from "@/lib/sender-config";
+import { layout, rightPanel } from "@/lib/ui-tokens";
 
 interface RightPanelProps {
   cards: Card[];
 }
-
-const SENDER_LABEL: Record<string, string> = {
-  client:    "Client",
-  boss:      "Manager",
-  colleague: "Colleague",
-  auto:      "Automated",
-  unknown:   "Unknown",
-};
-
-const SENDER_COLOR: Record<string, string> = {
-  client:    "bg-blue-100 text-blue-700",
-  boss:      "bg-red-100 text-red-700",
-  colleague: "bg-emerald-100 text-emerald-700",
-  auto:      "bg-gray-100 text-gray-500",
-  unknown:   "bg-gray-100 text-gray-500",
-};
 
 function buildInsightSummary(cards: Card[]): string {
   if (cards.length === 0) return "Your inbox is clear. No pending items.";
@@ -83,14 +68,6 @@ export function RightPanel({ cards }: RightPanelProps) {
 
   const insight = buildInsightSummary(cards);
 
-  const COL_DOT: Record<string, string> = {
-    action:  "bg-orange-400",
-    overdue: "bg-red-500",
-    sub:     "bg-blue-400",
-    invoice: "bg-amber-400",
-    other:   "bg-violet-400",
-  };
-
   return (
     <aside className={layout.rightPanelShell + " flex flex-col"}>
       <div className="px-4 py-5 flex flex-col gap-5">
@@ -135,10 +112,10 @@ export function RightPanel({ cards }: RightPanelProps) {
               <div className="mt-3 space-y-1.5">
                 {(
                   [
-                    { label: "Action", count: cards.filter((c) => ["action","overdue"].includes(c.col)).length, color: "bg-red-400" },
-                    { label: "Invoices", count: invoiceCards.length, color: "bg-amber-400" },
-                    { label: "Subs", count: cards.filter((c) => c.col === "sub").length, color: "bg-blue-400" },
-                    { label: "FYI", count: cards.filter((c) => c.col === "other").length, color: "bg-violet-400" },
+                    { label: "Action", count: cards.filter((c) => ["action","overdue"].includes(c.col)).length, color: rightPanel.categoryBarColor.action },
+                    { label: "Invoices", count: invoiceCards.length, color: rightPanel.categoryBarColor.invoice },
+                    { label: "Subs", count: cards.filter((c) => c.col === "sub").length, color: rightPanel.categoryBarColor.sub },
+                    { label: "FYI", count: cards.filter((c) => c.col === "other").length, color: rightPanel.categoryBarColor.other },
                   ] as const
                 ).filter((s) => s.count > 0).map((stat) => (
                   <div key={stat.label} className="flex items-center gap-2">
@@ -179,8 +156,8 @@ export function RightPanel({ cards }: RightPanelProps) {
                     {truncate(card.task, 55)}
                   </p>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-md ${SENDER_COLOR[card.senderType] ?? SENDER_COLOR.unknown}`}>
-                      {SENDER_LABEL[card.senderType] ?? "Unknown"}
+                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-md ${SENDER_TYPE_BADGE[card.senderType]}`}>
+                      {SENDER_TYPE_LABEL[card.senderType]}
                     </span>
                     <span className="text-[9px] text-red-500 font-semibold">
                       {card.deadline ?? "Overdue"}
@@ -214,8 +191,8 @@ export function RightPanel({ cards }: RightPanelProps) {
                     {truncate(card.task, 55)}
                   </p>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-md ${SENDER_COLOR[card.senderType] ?? SENDER_COLOR.unknown}`}>
-                      {SENDER_LABEL[card.senderType] ?? "Unknown"}
+                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-md ${SENDER_TYPE_BADGE[card.senderType]}`}>
+                      {SENDER_TYPE_LABEL[card.senderType]}
                     </span>
                     {card.deadline && (
                       <span className="text-[9px] text-amber-600 font-medium">
@@ -274,7 +251,7 @@ export function RightPanel({ cards }: RightPanelProps) {
                   key={card.id}
                   className="bg-white rounded-lg border border-gray-100 px-3 py-2 shadow-sm flex items-start gap-2"
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${COL_DOT[card.col] ?? "bg-gray-300"}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${rightPanel.colDot[card.col] ?? "bg-gray-300"}`} />
                   <div className="min-w-0">
                     <p className="text-[11px] font-medium text-gray-700 leading-tight truncate">
                       {truncate(card.task, 48)}

@@ -275,6 +275,23 @@ export const actionUrgencyStyle = {
   },
 } as const;
 
+/** Right panel — column dots and category bar colors (distinct from board COL_CONFIG) */
+export const rightPanel = {
+  colDot: {
+    action: "bg-orange-400",
+    overdue: "bg-red-500",
+    sub: "bg-blue-400",
+    invoice: "bg-amber-400",
+    other: "bg-violet-400",
+  } satisfies Record<ColId, string>,
+  categoryBarColor: {
+    action: "bg-red-400",
+    invoice: "bg-amber-400",
+    sub: "bg-blue-400",
+    other: "bg-violet-400",
+  },
+} as const;
+
 /** Layout tokens */
 export const layout = {
   mainContent:

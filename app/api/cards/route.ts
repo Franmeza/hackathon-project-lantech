@@ -2,38 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/db";
 import { classifyEmail } from "@/lib/openai";
+import { serializeCard } from "@/lib/card-serializer";
 import { trashGmailMessage, getAccountTokens } from "@/lib/gmail";
-import type { Card } from "@/types";
-
-function serializeCard(card: {
-  id: string;
-  col: string;
-  sender: string;
-  senderType: string;
-  time: string;
-  task: string;
-  reason: string;
-  deadline: string | null;
-  reply: string | null;
-  archived: boolean;
-  gmailMsgId: string | null;
-  createdAt: Date;
-}): Card {
-  return {
-    id: card.id,
-    col: card.col as Card["col"],
-    sender: card.sender,
-    senderType: card.senderType as Card["senderType"],
-    time: card.time,
-    task: card.task,
-    reason: card.reason,
-    deadline: card.deadline,
-    reply: card.reply,
-    archived: card.archived,
-    gmailMsgId: card.gmailMsgId,
-    createdAt: card.createdAt.toISOString(),
-  };
-}
 
 // GET /api/cards — return cards for the signed-in user
 export async function GET(): Promise<NextResponse> {
