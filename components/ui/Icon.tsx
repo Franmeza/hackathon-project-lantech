@@ -4,6 +4,7 @@ import {
   IconBell,
   IconBrandGoogle,
   IconBulb,
+  IconCheckbox,
   IconChevronLeft,
   IconClipboardText,
   IconClock,
@@ -14,6 +15,7 @@ import {
   IconMessageReply,
   IconReceipt,
   IconSparkles,
+  IconTrash,
   type IconProps as TablerIconProps,
 } from "@tabler/icons-react";
 import { iconSizes } from "@/lib/ui-tokens";
@@ -23,6 +25,7 @@ export type IconName =
   | "bell"
   | "brand-google"
   | "bulb"
+  | "checkbox"
   | "chevron-left"
   | "clipboard-text"
   | "clock"
@@ -32,7 +35,8 @@ export type IconName =
   | "mail"
   | "message-reply"
   | "receipt"
-  | "sparkles";
+  | "sparkles"
+  | "trash";
 
 export type IconSize = keyof typeof iconSizes;
 
@@ -46,6 +50,7 @@ const ICON_MAP: Record<
   bell: IconBell,
   "brand-google": IconBrandGoogle,
   bulb: IconBulb,
+  checkbox: IconCheckbox,
   "chevron-left": IconChevronLeft,
   "clipboard-text": IconClipboardText,
   clock: IconClock,
@@ -56,6 +61,7 @@ const ICON_MAP: Record<
   "message-reply": IconMessageReply,
   receipt: IconReceipt,
   sparkles: IconSparkles,
+  trash: IconTrash,
 };
 
 const TILE_ICON: Record<TileIconId, IconName> = {

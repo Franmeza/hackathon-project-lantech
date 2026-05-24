@@ -4,7 +4,6 @@ import type { Card, TileDefinition } from "@/types";
 import { COL_CONFIG } from "@/lib/col-config";
 import { DotIndicator } from "@/components/ui/DotIndicator";
 import { TileIcon, type TileIconId } from "@/components/ui/Icon";
-import { Pill } from "@/components/ui/Pill";
 import {
   dashboardTileLayout,
   surfaces,
@@ -37,32 +36,29 @@ export function CategoryTile({ tile, cards, onClick }: CategoryTileProps) {
         identity.hoverBorder
       }
     >
-      <div className={dashboardTileLayout.categoryHeader}>
-        <div className={dashboardTileLayout.categoryTitleRow}>
-          <div className={dashboardTileLayout.categoryTitleBlock}>
-            <span
-              className={
-                dashboardTileLayout.categoryIcon + " " + identity.iconBg
-              }
-            >
-              <TileIcon
-                tileId={tile.id as TileIconId}
-                size="sm"
-                className={identity.iconColor}
-              />
-            </span>
-            <span className={dashboardTileLayout.categoryTitle}>{tile.label}</span>
-          </div>
-          <Pill
-            bg={colConfig.pillBg}
-            text={colConfig.pillText}
-            border={colConfig.pillBorder}
-            className="shrink-0"
+      <div className="flex items-start justify-between gap-4 mb-3.5">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <span
+            className={`${dashboardTileLayout.categoryIcon} ${identity.iconBg} shrink-0`}
           >
-            {cards.length}
-          </Pill>
+            <TileIcon
+              tileId={tile.id as TileIconId}
+              size="sm"
+              className={identity.iconColor}
+            />
+          </span>
+          <div className="flex flex-col min-w-0">
+            <span className={dashboardTileLayout.categoryTitle}>{tile.label}</span>
+            <p className="text-[12px] text-gray-400 mt-1 leading-snug">{tile.subtitle}</p>
+          </div>
         </div>
-        <p className={dashboardTileLayout.categorySubtitle}>{tile.subtitle}</p>
+        <div
+          className={`flex flex-col items-center justify-center rounded-xl px-3 py-2 shrink-0 ${identity.iconBg}`}
+        >
+          <span className={`text-2xl font-bold leading-none tabular-nums ${identity.counterColor}`}>
+            {cards.length}
+          </span>
+        </div>
       </div>
 
       {previews.length > 0 ? (
@@ -85,7 +81,11 @@ export function CategoryTile({ tile, cards, onClick }: CategoryTileProps) {
           ))}
         </div>
       ) : (
-        <p className="text-[11px] text-gray-400 flex-1">No items yet</p>
+        <div className="flex-1">
+          <div className="flex items-center justify-center rounded-xl border border-dashed border-gray-200 px-3 py-4 text-[11px] text-gray-300">
+            None
+          </div>
+        </div>
       )}
 
       <div className={dashboardTileLayout.categoryFooter}>

@@ -67,7 +67,7 @@ export function DashboardView({
   ).filter((t): t is NonNullable<typeof t> => t !== undefined);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-5">
       <div>
         <div className="flex items-center gap-2 mb-1">
           {userEmail && (

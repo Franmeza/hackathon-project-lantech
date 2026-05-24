@@ -25,7 +25,7 @@ export function ColumnHeader({
 }: ColumnHeaderProps) {
   return (
     <div
-      className={`flex items-center gap-2 mb-2.5 pb-2.5 border-b border-gray-100 ${className}`.trim()}
+      className={`flex items-center gap-2 mb-3.5 pb-3 border-b border-gray-100 ${className}`.trim()}
     >
       {showDot && dotClass && <DotIndicator colorClass={dotClass} />}
       <span className={typography.columnLabel}>{label}</span>

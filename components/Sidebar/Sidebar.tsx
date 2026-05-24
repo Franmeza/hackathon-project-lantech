@@ -90,6 +90,9 @@ export function Sidebar({
     ? sidebarLayout.navButtonExpanded
     : sidebarLayout.navButtonCollapsed;
 
+  // Index used by the sliding active pill
+  const activeIdx = NAV_ITEMS.findIndex((item) => item.id === view);
+
   function handleMouseEnter() {
     if (mode === "expand-on-hover") setHoverExpanded(true);
   }
@@ -101,6 +104,13 @@ export function Sidebar({
   }
 
   return (
+    <>
+    <style>{`
+      @keyframes menuIn {
+        from { opacity: 0; transform: translateY(6px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0)   scale(1);    }
+      }
+    `}</style>
     <aside
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -111,12 +121,19 @@ export function Sidebar({
         (hydrated ? "" : " " + sidebarLayout.expandedWidth)
       }
     >
-      <nav className={sidebarLayout.navList}>
+      <nav className={sidebarLayout.navList + " relative"}>
+        {/* Sliding active pill — moves between items with a spring easing */}
+        <div
+          aria-hidden
+          className="absolute inset-x-2 h-9 rounded-xl bg-zinc-700 pointer-events-none"
+          style={{
+            transform: `translateY(${activeIdx * 40}px)`,
+            transition: "transform 240ms cubic-bezier(0.34, 1.4, 0.64, 1)",
+          }}
+        />
+
         {NAV_ITEMS.map((item) => {
           const isActive = view === item.id;
-          const stateClass = isActive
-            ? sidebarLayout.navButtonActive
-            : sidebarLayout.navButtonInactive;
           const labelClass = isActive
             ? sidebarLayout.navLabelActive
             : sidebarLayout.navLabelInactive;
@@ -130,20 +147,27 @@ export function Sidebar({
               onClick={() => onNavigate(item.id)}
               title={!isExpanded ? item.label : undefined}
               aria-label={item.label}
-              className={
-                sidebarLayout.navButtonBase +
-                " " +
-                navSizeClass +
-                " " +
-                stateClass
-              }
+              className={[
+                sidebarLayout.navButtonBase,
+                navSizeClass,
+                "relative z-10 transition-transform active:scale-[0.96]",
+                !isActive ? "hover:bg-zinc-700/50" : "",
+              ].filter(Boolean).join(" ")}
             >
               <Icon name={item.icon} size="md" className={iconClass} />
-              {isExpanded && (
-                <span className={sidebarLayout.navLabel + " " + labelClass}>
-                  {item.label}
-                </span>
-              )}
+
+              {/* Label fades + slides with max-width so it doesn't jump */}
+              <span
+                className={`${sidebarLayout.navLabel} ${labelClass} overflow-hidden whitespace-nowrap`}
+                style={{
+                  maxWidth: isExpanded ? "120px" : "0px",
+                  opacity: isExpanded ? 1 : 0,
+                  transition: "max-width 200ms ease, opacity 150ms ease",
+                }}
+              >
+                {item.label}
+              </span>
+
               {item.id === "archive" && archiveCount > 0 && (
                 <span
                   className={
@@ -173,7 +197,13 @@ export function Sidebar({
         />
         <div ref={controlRef} className={sidebarLayout.controlWrapper}>
           {menuOpen && (
-            <div className={sidebarLayout.controlMenu} role="menu">
+            <div
+              className={sidebarLayout.controlMenu}
+              role="menu"
+              style={{
+                animation: "menuIn 140ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+              }}
+            >
               <p className={sidebarLayout.controlMenuTitle}>Sidebar control</p>
               {MODE_OPTIONS.map((option) => (
                 <button
@@ -208,5 +238,6 @@ export function Sidebar({
         </div>
       </div>
     </aside>
+    </>
   );
 }

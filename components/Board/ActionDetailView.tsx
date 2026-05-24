@@ -13,6 +13,10 @@ interface ActionDetailViewProps {
   onDragStart: (e: React.DragEvent, id: string) => void;
   onDragEnd: () => void;
   onArchive: (id: string) => void;
+  isSelecting?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  exitingIds?: Set<string>;
 }
 
 function filterGroupCards(groupId: string, cards: Card[]): Card[] {
@@ -38,13 +42,17 @@ export function ActionDetailView({
   onDragStart,
   onDragEnd,
   onArchive,
+  isSelecting,
+  selectedIds,
+  onToggleSelect,
+  exitingIds,
 }: ActionDetailViewProps) {
   return (
     <div className="grid grid-cols-3 gap-4">
       {actionGroupHeaders.map((group) => {
         const groupCards = filterGroupCards(group.id, cards);
         return (
-          <div key={group.id} className="flex flex-col">
+          <div key={group.id} className="flex flex-col bg-gray-50 rounded-2xl border border-gray-200 p-3 px-4">
             <ColumnHeader
               label={group.label}
               count={groupCards.length}
@@ -62,6 +70,10 @@ export function ActionDetailView({
                   onDragStart={onDragStart}
                   onDragEnd={onDragEnd}
                   onArchive={onArchive}
+                  isSelecting={isSelecting}
+                  selected={selectedIds?.has(card.id)}
+                  onToggleSelect={onToggleSelect}
+                  exitingIds={exitingIds}
                 />
               ))}
               {groupCards.length === 0 && <EmptyState>None</EmptyState>}

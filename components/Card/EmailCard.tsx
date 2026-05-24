@@ -7,6 +7,7 @@ import { Card as UiCard } from "@/components/ui/Card";
 import { DotIndicator } from "@/components/ui/DotIndicator";
 import { Icon } from "@/components/ui/Icon";
 import { functionalColors, typography, cardHoverBorderByCol } from "@/lib/ui-tokens";
+import { MessageModal } from "@/components/Card/MessageModal";
 
 interface EmailCardProps {
   card: Card;
@@ -14,6 +15,10 @@ interface EmailCardProps {
   onDragStart: (e: React.DragEvent, id: string) => void;
   onDragEnd: () => void;
   onArchive: (id: string) => void;
+  isSelecting?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
+  exitingIds?: Set<string>;
 }
 
 export function EmailCard({
@@ -22,6 +27,10 @@ export function EmailCard({
   onDragStart,
   onDragEnd,
   onArchive,
+  isSelecting = false,
+  selected = false,
+  onToggleSelect,
+  exitingIds,
 }: EmailCardProps) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [draft, setDraft] = useState<string | null>(card.reply);
@@ -29,6 +38,19 @@ export function EmailCard({
   const [genError, setGenError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selfExiting, setSelfExiting] = useState(false);
+
+  const isExiting = selfExiting || (exitingIds?.has(card.id) ?? false);
+
+  function archiveWithAnimation() {
+    setSelfExiting(true);
+    setTimeout(() => onArchive(card.id), 200);
+  }
+
+  function handleDeletedAnimation() {
+    setSelfExiting(true);
+  }
 
   const cfg = colConfig[card.col];
   const isActionable = card.col === "action" || card.col === "overdue";
@@ -56,38 +78,48 @@ export function EmailCard({
     setTimeout(() => setCopied(false), 1500);
   }
 
-  const borderClass = hovered ? cardHoverBorderByCol[card.col] : "border-gray-200";
+  const borderClass = selected
+    ? "border-indigo-300"
+    : hovered
+    ? cardHoverBorderByCol[card.col]
+    : "border-gray-200";
+
+  const bgClass = selected ? "bg-indigo-50/40" : "";
 
   return (
+    <>
+    <div
+      className={`transition-all duration-200 ease-out ${
+        isExiting ? "opacity-0 scale-[0.96] -translate-y-1 pointer-events-none" : "opacity-100 scale-100 translate-y-0"
+      }`}
+    >
     <UiCard
-      draggable
+      draggable={!isSelecting}
       borderClass={borderClass}
-      className="cursor-grab transition-colors relative"
+      className={`cursor-pointer transition-colors relative active:scale-[0.98] active:shadow-none ${bgClass}`}
+      onClick={() => isSelecting ? onToggleSelect?.(card.id) : setModalOpen(true)}
       onDragStart={(e) => onDragStart(e, card.id)}
       onDragEnd={onDragEnd}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {hovered && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onArchive(card.id);
-          }}
-          title="Archive"
-          className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-gray-200 bg-gray-50 text-gray-500 text-[10px] font-medium hover:bg-gray-100 hover:text-gray-700 hover:border-gray-300 transition-colors"
-        >
-          <Icon name="archive" size="xs" />
-          Archive
-        </button>
-      )}
-
-      <div
-        className={
-          "flex justify-between items-start mb-1.5 " + (hovered ? "pr-16" : "")
-        }
+        <div
+        className="flex justify-between items-start mb-1.5"
       >
         <span className={"flex items-center gap-1.5 " + typography.senderName}>
+          {isSelecting && (
+            <span
+              className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+                selected ? "bg-indigo-500 border-indigo-500" : "border-gray-300 bg-white"
+              }`}
+            >
+              {selected && (
+                <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                  <path d="M1 3l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </span>
+          )}
           <DotIndicator colorClass={cfg.dot} />
           {card.sender}
         </span>
@@ -110,7 +142,7 @@ export function EmailCard({
 
         {isActionable && !draft && (
           <button
-            onClick={generateDraft}
+            onClick={(e) => { e.stopPropagation(); generateDraft(); }}
             disabled={generating}
             className="flex items-center gap-1.5 text-[11px] px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors disabled:opacity-60"
           >
@@ -130,7 +162,7 @@ export function EmailCard({
 
         {draft && (
           <button
-            onClick={() => setReplyOpen((v) => !v)}
+            onClick={(e) => { e.stopPropagation(); setReplyOpen((v) => !v); }}
             className={functionalColors.draftReply + " inline-flex items-center gap-1"}
           >
             <Icon name="message-reply" size="xs" />
@@ -146,13 +178,13 @@ export function EmailCard({
           {draft}
           <div className="flex items-center gap-2 mt-2 pt-2 border-t border-blue-100">
             <button
-              onClick={copyDraft}
+              onClick={(e) => { e.stopPropagation(); copyDraft(); }}
               className="text-[11px] px-2 py-0.5 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors"
             >
               {copied ? "Copied!" : "Copy"}
             </button>
             <button
-              onClick={generateDraft}
+              onClick={(e) => { e.stopPropagation(); generateDraft(); }}
               disabled={generating}
               className="text-[11px] px-2 py-0.5 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50"
             >
@@ -162,5 +194,15 @@ export function EmailCard({
         </div>
       )}
     </UiCard>
+    </div>
+    {modalOpen && (
+      <MessageModal
+        card={card}
+        onClose={() => setModalOpen(false)}
+        onArchive={archiveWithAnimation}
+        onDeleted={handleDeletedAnimation}
+      />
+    )}
+    </>
   );
 }

@@ -17,6 +17,10 @@ interface ColumnProps {
   onDragLeave: () => void;
   onDrop: (e: React.DragEvent, colId: ColId) => void;
   onArchive: (id: string) => void;
+  isSelecting?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  exitingIds?: Set<string>;
 }
 
 export function Column({
@@ -30,6 +34,10 @@ export function Column({
   onDragLeave,
   onDrop,
   onArchive,
+  isSelecting,
+  selectedIds,
+  onToggleSelect,
+  exitingIds,
 }: ColumnProps) {
   const cfg = config[colId];
   const isOver = dragOver === colId;
@@ -40,7 +48,7 @@ export function Column({
     : dropZoneBase + " border-transparent";
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-gray-50 rounded-2xl border border-gray-200 p-3 px-4">
       <ColumnHeader
         label={cfg.label}
         count={cards.length}
@@ -67,6 +75,10 @@ export function Column({
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onArchive={onArchive}
+            isSelecting={isSelecting}
+            selected={selectedIds?.has(card.id)}
+            onToggleSelect={onToggleSelect}
+            exitingIds={exitingIds}
           />
         ))}
         {cards.length === 0 && <EmptyState>Drop cards here</EmptyState>}

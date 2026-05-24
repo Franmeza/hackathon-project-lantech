@@ -20,7 +20,7 @@ export const surfaces = {
 /** Typography tokens — must match STANDARDS.md */
 export const typography = {
   pageTitle: "text-lg font-semibold text-gray-900 tracking-tight",
-  columnLabel: "text-[13px] font-semibold text-gray-700",
+  columnLabel: "text-[18px] font-semibold text-gray-700",
   body: "text-[13px] text-gray-800 leading-snug",
   bodyMuted: "text-[13px] text-gray-500 leading-snug",
   meta: "text-[11px] text-gray-400",
@@ -191,24 +191,28 @@ export const tileIdentity = {
   action: {
     iconBg: "bg-red-100",
     iconColor: "text-red-600",
+    counterColor: "text-red-900",
     link: "text-red-600 group-hover:text-red-700",
     hoverBorder: "hover:border-red-400",
   },
   invoice: {
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
+    counterColor: "text-amber-900",
     link: "text-amber-600 group-hover:text-amber-700",
     hoverBorder: "hover:border-amber-300",
   },
   other: {
     iconBg: "bg-violet-100",
     iconColor: "text-violet-700",
+    counterColor: "text-violet-950",
     link: "text-violet-700 group-hover:text-violet-800",
     hoverBorder: "hover:border-violet-300",
   },
   sub: {
     iconBg: "bg-green-100",
     iconColor: "text-green-700",
+    counterColor: "text-green-900",
     link: "text-green-700 group-hover:text-green-800",
     hoverBorder: "hover:border-green-300",
   },
@@ -258,20 +262,20 @@ export const layout = {
 /** Dashboard tile layout */
 export const dashboardTileLayout = {
   heroCard:
-    "group w-full text-left cursor-pointer transition-colors rounded-xl border-2 border-red-400 bg-white p-4 font-sans hover:border-red-500",
-  heroHeader: "flex items-start justify-between gap-4 mb-3",
-  heroTitleBlock: "flex items-start gap-2.5 min-w-0",
+    "group w-full text-left cursor-pointer transition-colors rounded-xl border-2 border-red-400 bg-white p-5 font-sans hover:border-red-500",
+  heroHeader: "flex items-start justify-between gap-4 mb-4",
+  heroTitleBlock: "flex items-center gap-3.5 min-w-0",
   heroIcon:
     "w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-base shrink-0",
-  heroTitle: "text-sm font-semibold text-gray-900 leading-tight",
-  heroSubtitle: typography.subtitle,
+  heroTitle: "text-base font-semibold text-gray-900 leading-tight",
+  heroSubtitle: typography.subtitle + " mt-1",
   statGrid: "flex gap-2 shrink-0",
-  statBox: "flex flex-col items-center justify-center rounded-lg px-3 py-1.5 min-w-[68px]",
+  statBox: "flex flex-col items-center justify-center rounded-lg px-3 py-2 min-w-[68px]",
   statNumber: "text-lg font-semibold leading-none",
   statLabel: "text-[10px] text-gray-500 mt-0.5",
-  previewList: "flex flex-col gap-1.5",
+  previewList: "flex flex-col gap-2",
   previewRow:
-    "flex items-center gap-2.5 rounded-lg bg-gray-50 px-2.5 py-2",
+    "flex items-center gap-2.5 rounded-lg bg-gray-50 px-3 py-2.5",
   previewAvatar:
     "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0",
   previewContent: "flex-1 min-w-0",
@@ -280,21 +284,21 @@ export const dashboardTileLayout = {
   previewMeta: "flex items-center gap-2 shrink-0",
   previewTime: "text-[11px] whitespace-nowrap",
   categoryCard:
-    "group flex flex-col h-full w-full text-left cursor-pointer transition-colors rounded-xl border bg-white p-4 font-sans",
-  categoryHeader: "mb-2.5",
+    "group flex flex-col h-full w-full text-left cursor-pointer transition-colors rounded-xl border bg-white p-5 font-sans",
+  categoryHeader: "mb-3.5",
   categoryTitleRow: "flex items-center justify-between gap-2",
   categoryTitleBlock: "flex items-center gap-2 min-w-0",
   categoryIcon:
     "w-7 h-7 rounded-lg flex items-center justify-center text-sm shrink-0",
-  categoryTitle: "text-xs font-semibold text-gray-900 truncate",
-  categorySubtitle: typography.subtitle + " mt-0.5",
-  categoryPreviewList: "flex flex-col gap-1.5 flex-1",
+  categoryTitle: "text-sm font-semibold text-gray-900 truncate",
+  categorySubtitle: typography.subtitle + " mt-1.5",
+  categoryPreviewList: "flex flex-col gap-2 flex-1",
   categoryPreviewRow:
-    "flex items-start gap-2 rounded-lg bg-gray-50 px-2.5 py-2",
+    "flex items-start gap-2.5 rounded-lg bg-gray-50 px-3 py-2.5",
   categoryPreviewDot: "mt-1 shrink-0",
   categoryPreviewSender: "text-xs font-semibold text-gray-900 truncate",
   categoryPreviewTask: "text-[11px] text-gray-500 truncate",
-  categoryFooter: "flex justify-end mt-3 pt-1",
+  categoryFooter: "flex justify-end mt-4 pt-1",
   categoryLink: "text-[11px] font-medium transition-colors",
   heroFooter: "flex justify-end mt-3 pt-1",
   heroLink: "text-[11px] font-medium text-red-600 group-hover:text-red-700 transition-colors",
