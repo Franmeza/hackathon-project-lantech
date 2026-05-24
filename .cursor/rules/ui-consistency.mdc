@@ -1,0 +1,32 @@
+---
+description: UI consistency guardrails — preserve look and feel, confirm before changing
+globs: "**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# UI Consistency
+
+When editing `.tsx` or `.css` files in this project:
+
+1. Consult `.cursor/skills/ui-consistency/STANDARDS.md` before making UI changes.
+2. Prefer `components/ui/*` and `lib/ui-tokens.ts` over duplicated inline Tailwind classes.
+3. Category colors must come from `lib/col-config.ts` (`COL_CONFIG`).
+4. Functional colors (deadline, reply, buttons) use `functionalColors` from `lib/ui-tokens.ts`.
+5. **Never use dynamic Tailwind classes** in `className` template literals (e.g. `` `hover:${x}` ``).
+6. **Do not change visual appearance** — refactors must preserve the same final Tailwind classes on the DOM.
+7. **Propose changes and wait for user confirmation** before editing (see `ui-consistency` skill).
+8. Do not suggest visual improvements, redesigns, dark mode, or responsive overhauls.
+9. After significant UI changes, run:
+   ```bash
+   node .cursor/skills/ui-consistency/scripts/validate-ui.mjs
+   ```
+
+## Shared primitives
+
+Use these instead of copying class strings:
+
+- `DotIndicator`, `Pill`, `AiChip`, `Card`, `Button`, `EmptyState`, `ColumnHeader`
+
+## Allowed custom font sizes
+
+`text-[9px]`, `text-[10px]`, `text-[11px]`, `text-[12px]`, `text-[13px]`, plus `text-lg`, `text-xl`, `text-sm`, `text-xs`.

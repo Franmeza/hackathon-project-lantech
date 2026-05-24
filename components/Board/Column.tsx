@@ -2,6 +2,9 @@
 
 import type { Card, ColId, ColConfigMap } from "@/types";
 import { EmailCard } from "@/components/Card/EmailCard";
+import { ColumnHeader } from "@/components/ui/ColumnHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { dropZoneActiveByCol } from "@/lib/ui-tokens";
 
 interface ColumnProps {
   colId: ColId;
@@ -31,21 +34,22 @@ export function Column({
   const cfg = config[colId];
   const isOver = dragOver === colId;
 
+  const dropZoneBase = "min-h-44 rounded-xl p-0.5 border-2 transition-all";
+  const dropZoneClass = isOver
+    ? dropZoneBase + " border-dashed " + dropZoneActiveByCol[colId]
+    : dropZoneBase + " border-transparent";
+
   return (
     <div className="flex flex-col">
-      {/* Column header */}
-      <div className="flex items-center gap-2 mb-2.5 pb-2.5 border-b border-gray-100">
-        <span className="text-[13px] font-semibold text-gray-700">
-          {cfg.label}
-        </span>
-        <span
-          className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${cfg.pillBg} ${cfg.pillText} ${cfg.pillBorder}`}
-        >
-          {cards.length}
-        </span>
-      </div>
+      <ColumnHeader
+        label={cfg.label}
+        count={cards.length}
+        showDot={false}
+        pillBg={cfg.pillBg}
+        pillText={cfg.pillText}
+        pillBorder={cfg.pillBorder}
+      />
 
-      {/* Drop zone */}
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -53,11 +57,7 @@ export function Column({
         }}
         onDragLeave={onDragLeave}
         onDrop={(e) => onDrop(e, colId)}
-        className={`min-h-44 rounded-xl p-0.5 border-2 transition-all ${
-          isOver
-            ? `border-dashed ${cfg.accent} ${cfg.bg}`
-            : "border-transparent"
-        }`}
+        className={dropZoneClass}
       >
         {cards.map((card) => (
           <EmailCard
@@ -69,11 +69,7 @@ export function Column({
             onArchive={onArchive}
           />
         ))}
-        {cards.length === 0 && (
-          <div className="text-center py-8 text-xs text-gray-300 border border-dashed border-gray-200 rounded-xl">
-            Drop cards here
-          </div>
-        )}
+        {cards.length === 0 && <EmptyState>Drop cards here</EmptyState>}
       </div>
     </div>
   );

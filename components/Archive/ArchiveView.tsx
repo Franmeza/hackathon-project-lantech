@@ -2,6 +2,9 @@
 
 import type { Card, ColId, ColConfigMap } from "@/types";
 import { ArchiveCard } from "@/components/Card/ArchiveCard";
+import { ColumnHeader } from "@/components/ui/ColumnHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { typography } from "@/lib/ui-tokens";
 
 const COL_ORDER: ColId[] = ["action", "overdue", "invoice", "sub", "other"];
 
@@ -23,18 +26,16 @@ export function ArchiveView({ archived, colConfig, onRestore }: ArchiveViewProps
   return (
     <div className="flex-1 min-w-0">
       <div className="mb-5">
-        <span className="text-lg font-semibold text-gray-900 tracking-tight">
-          Archive
-        </span>
+        <span className={typography.pageTitle}>Archive</span>
         <span className="text-sm text-gray-400 ml-2.5">
           {archived.length} {archived.length === 1 ? "card" : "cards"}
         </span>
       </div>
 
       {archived.length === 0 ? (
-        <div className="text-center py-16 text-sm text-gray-300 border border-dashed border-gray-200 rounded-2xl">
+        <EmptyState size="large">
           Nothing archived yet — hover a card and click Archive to move it here.
-        </div>
+        </EmptyState>
       ) : (
         COL_ORDER.map((col) => {
           const items = grouped[col];
@@ -42,17 +43,15 @@ export function ArchiveView({ archived, colConfig, onRestore }: ArchiveViewProps
           const cfg = colConfig[col];
           return (
             <div key={col} className="mb-6">
-              <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-gray-100">
-                <span className={`w-2 h-2 rounded-full inline-block ${cfg.dot}`} />
-                <span className="text-[13px] font-semibold text-gray-700">
-                  {cfg.label}
-                </span>
-                <span
-                  className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${cfg.pillBg} ${cfg.pillText} ${cfg.pillBorder}`}
-                >
-                  {items.length}
-                </span>
-              </div>
+              <ColumnHeader
+                label={cfg.label}
+                count={items.length}
+                dotClass={cfg.dot}
+                pillBg={cfg.pillBg}
+                pillText={cfg.pillText}
+                pillBorder={cfg.pillBorder}
+                className="pb-2"
+              />
               {items.map((card) => (
                 <ArchiveCard
                   key={card.id}

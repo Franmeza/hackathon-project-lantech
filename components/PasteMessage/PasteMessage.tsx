@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { functionalColors, surfaces } from "@/lib/ui-tokens";
 
 interface PasteMessageProps {
   onExtracted: () => void;
@@ -40,16 +42,13 @@ export function PasteMessage({ onExtracted, fullWidth = false }: PasteMessagePro
   return (
     <div className={fullWidth ? "w-full" : undefined}>
       <div className={fullWidth ? "flex justify-end" : undefined}>
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-        >
+        <Button variant="secondary" onClick={() => setOpen((v) => !v)}>
           ✦ Paste message
-        </button>
+        </Button>
       </div>
 
       {open && (
-        <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+        <div className={surfaces.insetPanel}>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -57,27 +56,25 @@ export function PasteMessage({ onExtracted, fullWidth = false }: PasteMessagePro
             rows={4}
             className="w-full text-[13px] p-2.5 rounded-lg border border-gray-300 bg-white text-gray-800 resize-y focus:outline-none focus:ring-2 focus:ring-gray-300 leading-relaxed"
           />
-          {error && (
-            <p className="text-xs text-red-500 mt-1">{error}</p>
-          )}
+          {error && <p className={functionalColors.errorText}>{error}</p>}
           <div className="flex gap-2 mt-2.5">
-            <button
+            <Button
+              variant="primary"
               onClick={handleExtract}
               disabled={loading || !text.trim()}
-              className="text-[13px] font-medium px-4 py-1.5 rounded-lg bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "Extracting…" : "Extract actions"}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => {
                 setOpen(false);
                 setText("");
                 setError(null);
               }}
-              className="text-[13px] px-3.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       )}

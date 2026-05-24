@@ -1,3 +1,4 @@
+import { surfaces } from "@/lib/ui-tokens";
 import { prisma } from "@/lib/db";
 import { InboxBoard } from "@/components/Board/InboxBoard";
 import { PLACEHOLDER_CARDS } from "@/lib/placeholder-cards";
@@ -34,7 +35,7 @@ export default async function HomePage() {
   const initialCards = await getInitialCards();
 
   return (
-    <main className="min-h-screen bg-white flex">
+    <main className={"min-h-screen flex " + surfaces.page}>
       <InboxBoard initialCards={initialCards} />
     </main>
   );

@@ -8,6 +8,7 @@ import { ActionDetailView } from "@/components/Board/ActionDetailView";
 import { ArchiveView } from "@/components/Archive/ArchiveView";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { DashboardView } from "@/components/Dashboard/DashboardView";
+import { layout, typography, functionalColors } from "@/lib/ui-tokens";
 import type { Card, ColId } from "@/types";
 
 // Main nav: dashboard | archive
@@ -120,7 +121,7 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
       />
 
       {/* Main content */}
-      <div className="flex-1 min-w-0 px-10 py-8 max-w-4xl">
+      <div className={layout.mainContent}>
         {/* ── Archive view ── */}
         {mainView === "archive" && (
           <ArchiveView
@@ -153,10 +154,14 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
                 </button>
                 <span className="text-gray-300">/</span>
                 <span className="text-xl">{detailTile.icon}</span>
-                <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
-                  {detailTile.label}
-                </h1>
-                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${detailTile.id === "action" ? "border-red-200 bg-red-50 text-red-800" : "border-gray-200 bg-gray-50 text-gray-600"}`}>
+                <h1 className={typography.pageTitle}>{detailTile.label}</h1>
+                <span
+                  className={
+                    detailTile.id === "action"
+                      ? functionalColors.emailCount
+                      : functionalColors.detailEmailCountDefault
+                  }
+                >
                   {detailCards.length} emails
                 </span>
               </div>
@@ -173,9 +178,11 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
               />
             ) : (
               <div
-                className={`grid gap-4 ${
-                  detailTile.cols.length > 1 ? "grid-cols-2" : "grid-cols-1 max-w-md"
-                }`}
+                className={
+                  detailTile.cols.length > 1
+                    ? layout.detailColumnGridTwo
+                    : layout.detailColumnGridOne
+                }
               >
                 {detailTile.cols.map((colId) => (
                   <Column

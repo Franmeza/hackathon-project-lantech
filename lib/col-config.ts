@@ -60,8 +60,8 @@ export const TILE_DEFINITIONS: TileDefinition[] = [
     label: "Action Required",
     subtitle: "Needs your reply or decision",
     cols: ["action", "overdue"],
-    accentTop: "border-t-red-500",
-    countColor: "text-red-500",
+    accentTop: "border-t-orange-600",
+    countColor: "text-orange-600",
     icon: "⚡",
   },
   {
@@ -69,8 +69,8 @@ export const TILE_DEFINITIONS: TileDefinition[] = [
     label: "Subscriptions",
     subtitle: "Newsletters & promotions",
     cols: ["sub"],
-    accentTop: "border-t-blue-500",
-    countColor: "text-blue-500",
+    accentTop: "border-t-gray-400",
+    countColor: "text-gray-700",
     icon: "📨",
   },
   {
@@ -87,8 +87,8 @@ export const TILE_DEFINITIONS: TileDefinition[] = [
     label: "FYI",
     subtitle: "Informational updates",
     cols: ["other"],
-    accentTop: "border-t-teal-500",
-    countColor: "text-teal-500",
+    accentTop: "border-t-violet-500",
+    countColor: "text-violet-800",
     icon: "💡",
   },
 ];

@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import type { Card, ColConfigMap } from "@/types";
+import { AiChip } from "@/components/ui/AiChip";
+import { Card as UiCard } from "@/components/ui/Card";
+import { DotIndicator } from "@/components/ui/DotIndicator";
+import { functionalColors, typography, cardHoverBorderByCol } from "@/lib/ui-tokens";
 
 interface EmailCardProps {
   card: Card;
@@ -47,18 +51,20 @@ export function EmailCard({
     setTimeout(() => setCopied(false), 1500);
   }
 
+  const borderClass = hovered
+    ? cardHoverBorderByCol[card.col]
+    : "border-gray-200";
+
   return (
-    <div
+    <UiCard
       draggable
+      borderClass={borderClass}
+      className="cursor-grab transition-colors relative"
       onDragStart={(e) => onDragStart(e, card.id)}
       onDragEnd={onDragEnd}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`bg-white rounded-xl p-3 mb-2 cursor-grab transition-colors border ${
-        hovered ? cfg.border : "border-gray-200"
-      } relative font-sans`}
     >
-      {/* Archive button */}
       {hovered && (
         <button
           onClick={(e) => {
@@ -73,63 +79,48 @@ export function EmailCard({
         </button>
       )}
 
-      {/* Header */}
       <div
-        className={`flex justify-between items-start mb-1.5 ${
-          hovered ? "pr-16" : ""
-        }`}
+        className={
+          "flex justify-between items-start mb-1.5 " + (hovered ? "pr-16" : "")
+        }
       >
-        <span className="flex items-center gap-1.5 text-xs font-semibold text-gray-900">
-          <span
-            className={`w-2 h-2 rounded-full flex-shrink-0 inline-block ${cfg.dot}`}
-          />
+        <span className={"flex items-center gap-1.5 " + typography.senderName}>
+          <DotIndicator colorClass={cfg.dot} />
           {card.sender}
         </span>
-        <span className="text-[11px] text-gray-400 whitespace-nowrap ml-2">
+        <span className={typography.meta + " whitespace-nowrap ml-2"}>
           {card.time}
         </span>
       </div>
 
-      {/* Task */}
-      <p className="text-[13px] text-gray-800 leading-snug mb-1.5">
-        {card.task}
-      </p>
+      <p className={typography.body + " mb-1.5"}>{card.task}</p>
 
-      {/* AI reason chip */}
-      <div className="flex gap-1 items-start text-[11px] text-gray-500 bg-gray-50 border border-gray-100 rounded-md px-2 py-1 mb-2">
-        <span className="opacity-50 flex-shrink-0">✦</span>
-        {card.reason}
-      </div>
+      <AiChip className="mb-2">{card.reason}</AiChip>
 
-      {/* Badges */}
       <div className="flex gap-1.5 flex-wrap">
         {card.deadline && (
-          <span className="text-[11px] px-2 py-0.5 rounded-full border border-yellow-200 bg-yellow-50 text-yellow-800 flex items-center gap-1">
+          <span className={functionalColors.deadline + " flex items-center gap-1"}>
             ⏰ {card.deadline}
           </span>
         )}
         {card.reply && (
           <button
             onClick={() => setReplyOpen((v) => !v)}
-            className="text-[11px] px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100 transition-colors"
+            className={functionalColors.draftReply}
           >
             ✉ {replyOpen ? "Hide reply" : "Draft reply"}
           </button>
         )}
       </div>
 
-      {/* Draft reply panel */}
       {replyOpen && card.reply && (
-        <div className="mt-2 text-xs text-gray-700 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2 leading-relaxed">
+        <div className={functionalColors.replyPanel}>
           {card.reply}
-          <button
-            onClick={copyReply}
-            className="mt-1.5 block text-[11px] px-2 py-0.5 rounded-full border border-green-200 text-green-700 hover:bg-green-100 transition-colors"
-          >
+          <button onClick={copyReply} className={functionalColors.copyButton}>
             {copied ? "Copied!" : "Copy"}
           </button>
         </div>
       )}
-    </div>
+    </UiCard>
   );
 }

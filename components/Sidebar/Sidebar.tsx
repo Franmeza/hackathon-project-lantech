@@ -1,5 +1,7 @@
 "use client";
 
+import { layout, sidebarNavButton, sidebarNavLabel } from "@/lib/ui-tokens";
+
 type ViewId = "inbox" | "archive";
 
 interface SidebarProps {
@@ -48,7 +50,7 @@ const NAV_ITEMS: { id: ViewId; label: string }[] = [
 
 export function Sidebar({ view, onNavigate, archiveCount }: SidebarProps) {
   return (
-    <aside className="w-14 flex-shrink-0 flex flex-col items-center pt-2 gap-1 border-r border-gray-100">
+    <aside className={layout.sidebar}>
       {NAV_ITEMS.map((item) => {
         const isActive = view === item.id;
         return (
@@ -56,22 +58,14 @@ export function Sidebar({ view, onNavigate, archiveCount }: SidebarProps) {
             key={item.id}
             onClick={() => onNavigate(item.id)}
             title={item.label}
-            className={`relative w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-colors ${
-              isActive
-                ? "bg-gray-100"
-                : "bg-transparent hover:bg-gray-50"
-            }`}
+            className={isActive ? sidebarNavButton.active : sidebarNavButton.inactive}
           >
             {item.id === "inbox" ? (
               <InboxIcon active={isActive} />
             ) : (
               <ArchiveIcon active={isActive} />
             )}
-            <span
-              className={`text-[9px] font-medium leading-none ${
-                isActive ? "text-gray-900 font-semibold" : "text-gray-400"
-              }`}
-            >
+            <span className={isActive ? sidebarNavLabel.active : sidebarNavLabel.inactive}>
               {item.label}
             </span>
             {item.id === "archive" && archiveCount > 0 && (
