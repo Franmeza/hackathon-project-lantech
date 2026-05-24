@@ -61,7 +61,6 @@ Classify this email and return JSON with this exact shape:
   "task": "One concise sentence describing what needs to be done or what the email is about (max 120 chars)",
   "reason": "One sentence explaining why it was classified this way (max 100 chars)",
   "deadline": "Human-readable deadline for action/overdue items. Use 'Today' or 'Today EOD' when due today; a specific date when due later; null for invoice/sub/other or when no deadline exists",
-  "reply": "A short professional draft reply when col is action or overdue; otherwise null",
   "senderType": "client" | "boss" | "colleague" | "auto" | "unknown"
 }`;
 
@@ -98,9 +97,31 @@ export async function classifyEmail(
     task: parsed.task ?? subject ?? "No task extracted",
     reason: parsed.reason ?? "Classified by AI",
     deadline: parsed.deadline ?? null,
-    reply: parsed.reply ?? null,
+    reply: null,
     senderType: VALID_TYPES.includes(parsed.senderType as SenderType)
       ? (parsed.senderType as SenderType)
       : "unknown",
   };
+}
+
+const DRAFT_SYSTEM_PROMPT = `You are a professional email assistant. Write a concise, context-aware reply to the email provided.
+Keep it to 3–5 sentences. Be direct, friendly, and professional. Address exactly what the sender is asking for.
+Return ONLY the body of the reply — no subject line, no greeting like "Dear ...", no sign-off. Just the reply text.`;
+
+export async function generateDraftReply(
+  from: string,
+  subject: string,
+  body: string
+): Promise<string> {
+  const response = await openai.chat.completions.create({
+    model: "gpt-5-mini",
+    messages: [
+      { role: "system", content: DRAFT_SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: `Write a professional reply to this email:\n\nFrom: ${from}\nSubject: ${subject}\n\n${body.slice(0, 3000)}`,
+      },
+    ],
+  });
+  return response.choices[0]?.message?.content?.trim() ?? "";
 }
