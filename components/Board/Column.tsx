@@ -22,6 +22,7 @@ interface ColumnProps {
   isSelected?: (id: string) => boolean;
   onToggleSelect?: (id: string) => void;
   onArchiveAll?: (ids: string[]) => void;
+  exitingIds?: Set<string>;
 }
 
 export function Column({
@@ -39,6 +40,7 @@ export function Column({
   isSelected,
   onToggleSelect,
   onArchiveAll,
+  exitingIds,
 }: ColumnProps) {
   const cfg = config[colId];
   const isOver = dragOver === colId;
@@ -89,6 +91,7 @@ export function Column({
             selectionMode={selectionMode}
             selected={isSelected ? isSelected(card.id) : false}
             onToggleSelect={onToggleSelect}
+            exitingIds={exitingIds}
           />
         ))}
         {cards.length === 0 && <EmptyState>Drop cards here</EmptyState>}

@@ -73,6 +73,7 @@ export function Card({
       onDragEnd={onDragEnd}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={onClick}
       className={base}
     >
       {children}

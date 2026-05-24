@@ -5,6 +5,7 @@ import {
   IconBolt,
   IconBrandGoogle,
   IconBulb,
+  IconCheckbox,
   IconChevronLeft,
   IconClipboardText,
   IconClock,
@@ -30,6 +31,7 @@ export type IconName =
   | "bolt"
   | "brand-google"
   | "bulb"
+  | "checkbox"
   | "chevron-left"
   | "clipboard-text"
   | "clock"
@@ -59,6 +61,7 @@ const ICON_MAP: Record<
   bolt: IconBolt,
   "brand-google": IconBrandGoogle,
   bulb: IconBulb,
+  checkbox: IconCheckbox,
   "chevron-left": IconChevronLeft,
   "clipboard-text": IconClipboardText,
   clock: IconClock,

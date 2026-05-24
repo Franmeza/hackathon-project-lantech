@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useCards } from "@/hooks/useCards";
 import { useCardSelection } from "@/hooks/useCardSelection";
 import { COL_CONFIG, TILE_DEFINITIONS } from "@/lib/col-config";
-import { bulkArchive, bulkReclassify, bulkRestore } from "@/lib/cards-api";
+import { bulkArchive, bulkDelete, bulkReclassify, bulkRestore } from "@/lib/cards-api";
 import { Column } from "@/components/Board/Column";
 import { ActionDetailView } from "@/components/Board/ActionDetailView";
 import { ArchiveView } from "@/components/Archive/ArchiveView";
@@ -35,6 +35,7 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
 
   const selection = useCardSelection();
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [exitingIds, setExitingIds] = useState<Set<string>>(new Set());
   const [confirm, setConfirm] = useState<{
     open: boolean;
     title: string;
@@ -103,6 +104,10 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     mutate();
   }
 
+  function handleCardDeleted() {
+    mutate();
+  }
+
   function handleTileClick(tileId: string) {
     setDetailTileId(tileId);
   }
@@ -121,9 +126,6 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
 
   const sidebarView = mainView === "archive" ? "archive" : "inbox";
 
-  const bulkContext =
-    mainView === "archive" ? "archive" : detailTileId ? "inbox" : "inbox";
-
   function requestConfirm(
     title: string,
     description: string,
@@ -132,14 +134,19 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     setConfirm({ open: true, title, description, action });
   }
 
-  async function runBulk(action: () => Promise<void>) {
+  async function runBulk(action: () => Promise<void>, animateIds?: string[]) {
     setBulkBusy(true);
     try {
+      if (animateIds?.length) {
+        setExitingIds(new Set(animateIds));
+        await new Promise((r) => setTimeout(r, 220));
+      }
       await action();
       selection.exitMode();
       mutate();
     } finally {
       setBulkBusy(false);
+      setExitingIds(new Set());
     }
   }
 
@@ -147,14 +154,14 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     const ids = selection.selectedIds;
     await runBulk(async () => {
       await bulkArchive({ ids });
-    });
+    }, ids);
   }
 
   async function handleBulkRestoreSelected() {
     const ids = selection.selectedIds;
     await runBulk(async () => {
       await bulkRestore({ ids });
-    });
+    }, ids);
   }
 
   async function handleBulkReclassifySelected(col: ColId) {
@@ -162,6 +169,13 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     await runBulk(async () => {
       await bulkReclassify({ ids }, col);
     });
+  }
+
+  async function handleBulkDeleteSelected() {
+    const ids = selection.selectedIds;
+    await runBulk(async () => {
+      await bulkDelete(ids);
+    }, ids);
   }
 
   async function handleQuickArchiveAll(tileId: string) {
@@ -174,22 +188,34 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     const description = "These items will move to Archive. You can restore them later.";
 
     const action = async () => {
-      await bulkArchive({ filter: { cols: tile.cols, archived: false } });
+      await runBulk(async () => {
+        await bulkArchive({ filter: { cols: tile.cols, archived: false } });
+      });
     };
 
     if (isSensitive) requestConfirm(title, description, action);
-    else await runBulk(action);
+    else await action();
   }
 
   async function handleQuickRestoreAll(ids: string[]) {
     const title = `Restore ${ids.length} items?`;
     const description = "These items will move back to your active board.";
     const action = async () => {
-      await bulkRestore({ ids });
+      await runBulk(async () => {
+        await bulkRestore({ ids });
+      });
     };
     if (ids.length > 10) requestConfirm(title, description, action);
-    else await runBulk(action);
+    else await action();
   }
+
+  const cardSelectionProps = {
+    selectionMode: selection.selectionMode,
+    isSelected: selection.isSelected,
+    onToggleSelect: selection.toggle,
+    exitingIds,
+    onDeleted: handleCardDeleted,
+  };
 
   return (
     <div className="flex min-h-screen w-full font-sans">
@@ -224,36 +250,52 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
               const title = `Reclassify ${selection.selectedCount} items?`;
               const description =
                 "This will change the category for the selected items.";
-              requestConfirm(title, description, () => handleBulkReclassifySelected(col));
+              requestConfirm(title, description, () =>
+                handleBulkReclassifySelected(col)
+              );
             }}
+            onDelete={
+              mainView !== "archive"
+                ? () => {
+                    const title = `Delete ${selection.selectedCount} items?`;
+                    const description =
+                      "Linked Gmail messages will be moved to trash. This cannot be undone.";
+                    requestConfirm(title, description, handleBulkDeleteSelected);
+                  }
+                : undefined
+            }
           />
         )}
 
         {mainView === "archive" && (
-          <ArchiveView
-            archived={archivedCards}
-            colConfig={COL_CONFIG}
-            onRestore={handleRestore}
-            onRestoreAll={handleQuickRestoreAll}
-            selectionMode={selection.selectionMode}
-            onEnterSelection={selection.enterMode}
-            onExitSelection={selection.exitMode}
-            isSelected={selection.isSelected}
-            onToggleSelect={selection.toggle}
-          />
+          <div key="archive" className="page-enter">
+            <ArchiveView
+              archived={archivedCards}
+              colConfig={COL_CONFIG}
+              onRestore={handleRestore}
+              onRestoreAll={handleQuickRestoreAll}
+              selectionMode={selection.selectionMode}
+              onEnterSelection={selection.enterMode}
+              onExitSelection={selection.exitMode}
+              isSelected={selection.isSelected}
+              onToggleSelect={selection.toggle}
+            />
+          </div>
         )}
 
         {mainView === "dashboard" && !detailTileId && (
-          <DashboardView
-            activeCards={activeCards}
-            onTileClick={handleTileClick}
-            onExtracted={mutate}
-            userEmail={userEmail}
-          />
+          <div key="dashboard" className="page-enter">
+            <DashboardView
+              activeCards={activeCards}
+              onTileClick={handleTileClick}
+              onExtracted={mutate}
+              userEmail={userEmail}
+            />
+          </div>
         )}
 
         {mainView === "dashboard" && detailTileId && detailTile && (
-          <>
+          <div key={`detail-${detailTileId}`} className="page-enter-detail">
             <div className="flex items-center gap-3 mb-6">
               <button
                 onClick={handleBackToDashboard}
@@ -264,7 +306,11 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
               </button>
               <span className="text-gray-300">/</span>
               <span className="flex items-center">
-                <TileIcon tileId={detailTileId as TileIconId} size="md" className="text-gray-700" />
+                <TileIcon
+                  tileId={detailTileId as TileIconId}
+                  size="md"
+                  className="text-gray-700"
+                />
               </span>
               <h1 className={typography.pageTitle}>{detailTile.label}</h1>
               <span
@@ -307,9 +353,7 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
                 onDragStart={onDragStart}
                 onDragEnd={onDragEnd}
                 onArchive={handleArchive}
-                selectionMode={selection.selectionMode}
-                isSelected={selection.isSelected}
-                onToggleSelect={selection.toggle}
+                {...cardSelectionProps}
               />
             ) : (
               <div
@@ -332,14 +376,12 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
                     onDragLeave={onDragLeave}
                     onDrop={onDrop}
                     onArchive={handleArchive}
-                    selectionMode={selection.selectionMode}
-                    isSelected={selection.isSelected}
-                    onToggleSelect={selection.toggle}
+                    {...cardSelectionProps}
                   />
                 ))}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
@@ -354,12 +396,14 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
         confirming={bulkBusy}
         confirmText="Confirm"
         cancelText="Cancel"
-        onCancel={() => setConfirm({ open: false, title: "", description: "", action: null })}
+        onCancel={() =>
+          setConfirm({ open: false, title: "", description: "", action: null })
+        }
         onConfirm={async () => {
           if (!confirm.action) return;
           const action = confirm.action;
           setConfirm({ open: false, title: "", description: "", action: null });
-          await runBulk(action);
+          await action();
         }}
       />
     </div>

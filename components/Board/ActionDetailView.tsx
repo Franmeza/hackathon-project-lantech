@@ -16,6 +16,7 @@ interface ActionDetailViewProps {
   selectionMode?: boolean;
   isSelected?: (id: string) => boolean;
   onToggleSelect?: (id: string) => void;
+  exitingIds?: Set<string>;
 }
 
 function filterGroupCards(groupId: string, cards: Card[]): Card[] {
@@ -44,6 +45,7 @@ export function ActionDetailView({
   selectionMode = false,
   isSelected,
   onToggleSelect,
+  exitingIds,
 }: ActionDetailViewProps) {
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -71,6 +73,7 @@ export function ActionDetailView({
                   selectionMode={selectionMode}
                   selected={isSelected ? isSelected(card.id) : false}
                   onToggleSelect={onToggleSelect}
+                  exitingIds={exitingIds}
                 />
               ))}
               {groupCards.length === 0 && <EmptyState>None</EmptyState>}

@@ -13,6 +13,7 @@ interface BulkActionBarProps {
   onArchive: () => void;
   onRestore: () => void;
   onReclassify: (col: import("@/types").ColId) => void;
+  onDelete?: () => void;
 }
 
 export function BulkActionBar({
@@ -23,6 +24,7 @@ export function BulkActionBar({
   onArchive,
   onRestore,
   onReclassify,
+  onDelete,
 }: BulkActionBarProps) {
   if (count <= 0) return null;
 
@@ -39,6 +41,11 @@ export function BulkActionBar({
               <Button variant="secondary" onClick={onArchive} disabled={busy}>
                 {busy ? "Archiving…" : "Archive"}
               </Button>
+              {onDelete && (
+                <Button variant="secondary" onClick={onDelete} disabled={busy}>
+                  {busy ? "Deleting…" : "Delete"}
+                </Button>
+              )}
               <ReclassifyMenu disabled={busy} onSelect={onReclassify} />
             </>
           ) : (

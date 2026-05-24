@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/db";
 import { classifyEmail } from "@/lib/openai";
+import { trashGmailMessage, getAccountTokens } from "@/lib/gmail";
 import type { Card } from "@/types";
 
 function serializeCard(card: {
@@ -121,27 +122,51 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
   return NextResponse.json(serializeCard(card));
 }
 
-// DELETE /api/cards?id=xxx — permanently delete a card
+// DELETE /api/cards?id=xxx         — delete a single card
+// DELETE /api/cards?ids=x,y,z      — bulk delete
+// Cards linked to Gmail are moved to trash; others are removed from DB only.
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   const session = await requireSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const id = req.nextUrl.searchParams.get("id");
+  const single = req.nextUrl.searchParams.get("id");
+  const bulk   = req.nextUrl.searchParams.get("ids");
+  const ids    = single ? [single] : (bulk?.split(",").filter(Boolean) ?? []);
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  if (!ids.length) {
+    return NextResponse.json({ error: "Missing id or ids" }, { status: 400 });
   }
 
-  const existing = await prisma.card.findFirst({
-    where: { id, userId: session.user.id },
+  const cards = await prisma.card.findMany({
+    where: { id: { in: ids }, userId: session.user.id },
+    select: { id: true, gmailMsgId: true },
   });
 
-  if (!existing) {
+  if (!cards.length) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  await prisma.card.delete({ where: { id } });
-  return NextResponse.json({ ok: true });
+  // Trash linked Gmail messages in parallel; failures are non-fatal
+  const tokens = await getAccountTokens(session.user.id);
+  if (tokens?.accessToken) {
+    await Promise.all(
+      cards
+        .filter((c) => c.gmailMsgId)
+        .map((c) =>
+          trashGmailMessage(
+            c.gmailMsgId!,
+            tokens.accessToken,
+            tokens.refreshToken ?? undefined,
+            session.user.id
+          ).catch((err) =>
+            console.error(`Failed to trash Gmail message ${c.gmailMsgId}:`, err)
+          )
+        )
+    );
+  }
+
+  await prisma.card.deleteMany({ where: { id: { in: cards.map((c) => c.id) } } });
+  return NextResponse.json({ ok: true, deleted: cards.length });
 }

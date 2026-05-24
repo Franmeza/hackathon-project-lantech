@@ -65,3 +65,16 @@ export function bulkReclassify(
   } as BulkUpdatePayload);
 }
 
+export async function bulkDelete(ids: string[]): Promise<{ deleted: number }> {
+  const res = await fetch(`/api/cards?ids=${ids.join(",")}`, { method: "DELETE" });
+  const data = (await res.json().catch(() => ({}))) as unknown;
+  if (!res.ok) {
+    const msg =
+      typeof data === "object" && data !== null && "error" in data
+        ? String((data as { error?: unknown }).error ?? "Request failed")
+        : "Request failed";
+    throw new Error(msg);
+  }
+  return data as { deleted: number };
+}
+
