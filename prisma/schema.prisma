@@ -17,6 +17,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  cards         Card[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -62,7 +63,9 @@ model VerificationToken {
 
 model Card {
   id         String   @id @default(cuid())
-  col        String   // "action" | "overdue" | "sub" | "other"
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  col        String   // "action" | "overdue" | "sub" | "other" | "invoice"
   sender     String
   senderType String   // "client" | "boss" | "colleague" | "auto" | "unknown"
   time       String
@@ -74,4 +77,6 @@ model Card {
   gmailMsgId String?  @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([userId])
 }
