@@ -90,8 +90,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           email.body
         );
 
-        await prisma.card.create({
-          data: {
+        await prisma.card.upsert({
+          where: { gmailMsgId: msgId },
+          update: {},
+          create: {
+            userId: user.id,
             col: classification.col,
             sender: email.from,
             senderType: classification.senderType,
@@ -111,7 +114,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Update the stored historyId to the latest one
     await prisma.account.updateMany({
       where: { userId: user.id, provider: "google" },
-      data: { gmailHistoryId: historyId },
+      data: { gmailHistoryId: String(historyId) },
     });
 
     return NextResponse.json({ ok: true });

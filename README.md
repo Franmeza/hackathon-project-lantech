@@ -152,9 +152,9 @@ npm run dev
 
 ## Limitations
 
-- **Single user** — the board is not multi-tenant; all cards are global to the deployment
+- **Per-user cards** — each signed-in user sees only their own cards
 - **Gmail only** — no Outlook, Apple Mail, or other providers
-- **No sign-in UI** — OAuth sign-in must be triggered manually via `/api/auth/signin`; the board loads with placeholder data until a real Gmail account is connected
+- **Sign-in at `/sign-in`** — Google OAuth; only new emails after connect are processed (no inbox import)
 - **Push webhook requires public URL** — local development needs ngrok or a similar tunnel for real email ingestion; the Paste Message feature works locally without it
 - **Classification accuracy** — GPT-4o is good but not perfect; edge cases (e.g. hybrid action/invoice emails) may land in the wrong column
 - **No token refresh handling** — if the OAuth access token expires and refresh fails, email ingestion pauses until the user re-authenticates

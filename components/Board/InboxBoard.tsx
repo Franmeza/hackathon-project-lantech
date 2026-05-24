@@ -9,6 +9,7 @@ import { ArchiveView } from "@/components/Archive/ArchiveView";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { DashboardView } from "@/components/Dashboard/DashboardView";
 import { layout, typography, functionalColors } from "@/lib/ui-tokens";
+import { LogOutButton } from "@/components/Auth/LogOutButton";
 import type { Card, ColId } from "@/types";
 
 // Main nav: dashboard | archive
@@ -17,9 +18,10 @@ type MainView = "dashboard" | "archive";
 
 interface InboxBoardProps {
   initialCards?: Card[];
+  userEmail?: string;
 }
 
-export function InboxBoard({ initialCards }: InboxBoardProps) {
+export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
   const { cards: allCards, mutate } = useCards(initialCards);
   const [mainView, setMainView] = useState<MainView>("dashboard");
   const [detailTileId, setDetailTileId] = useState<string | null>(null);
@@ -118,6 +120,7 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
         view={sidebarView}
         onNavigate={handleSidebarNavigate}
         archiveCount={archivedCards.length}
+        userEmail={userEmail}
       />
 
       {/* Main content */}
@@ -137,6 +140,7 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
             activeCards={activeCards}
             onTileClick={handleTileClick}
             onExtracted={mutate}
+            userEmail={userEmail}
           />
         )}
 
@@ -165,6 +169,7 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
                   {detailCards.length} emails
                 </span>
               </div>
+              <LogOutButton />
             </div>
 
             {/* Column layout — Action Required gets 3 semantic columns */}
