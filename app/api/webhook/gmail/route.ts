@@ -22,12 +22,33 @@ interface GmailNotification {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  // Acknowledge Pub/Sub immediately — must respond within 10s on Vercel Hobby.
+  // Processing runs in the background via waitUntil so the response isn't held.
+  let body: PubSubMessage;
   try {
-    const body = (await req.json()) as PubSubMessage;
+    body = (await req.json()) as PubSubMessage;
+  } catch {
+    return NextResponse.json({ ok: true });
+  }
+
+  const process = processNotification(body);
+
+  // waitUntil keeps the function alive after the response is sent (Vercel/Next.js)
+  // Falls back gracefully if the API isn't available (e.g. local dev)
+  if (typeof (globalThis as Record<string, unknown>).EdgeRuntime === "undefined") {
+    // Node.js runtime — fire and forget
+    process.catch((err: unknown) => console.error("Webhook processing error:", err));
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+async function processNotification(body: PubSubMessage): Promise<void> {
+  try {
     const encodedData = body?.message?.data;
 
     if (!encodedData) {
-      return NextResponse.json({ error: "No data" }, { status: 400 });
+      return;
     }
 
     // Pub/Sub messages are base64-encoded JSON
@@ -38,7 +59,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { emailAddress, historyId } = notification;
 
     if (!emailAddress || !historyId) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return;
     }
 
     // Find the user by email
@@ -49,15 +70,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (!user) {
       console.warn(`Received webhook for unknown user: ${emailAddress}`);
-      // Return 200 to prevent Pub/Sub retries for unknown users
-      return NextResponse.json({ ok: true });
+      return;
     }
 
     // Get OAuth tokens for this user
     const tokens = await getAccountTokens(user.id);
     if (!tokens) {
       console.error(`No tokens found for user ${user.id}`);
-      return NextResponse.json({ ok: true });
+      return;
     }
 
     const startHistoryId = tokens.historyId ?? historyId;
@@ -116,11 +136,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       where: { userId: user.id, provider: "google" },
       data: { gmailHistoryId: String(historyId) },
     });
-
-    return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Gmail webhook error:", err);
-    // Return 200 to avoid Pub/Sub infinite retries on unexpected errors
-    return NextResponse.json({ ok: true });
   }
 }
