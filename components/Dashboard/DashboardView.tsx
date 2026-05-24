@@ -4,11 +4,13 @@ import type { Card } from "@/types";
 import { TILE_DEFINITIONS } from "@/lib/col-config";
 import { SummaryTile } from "@/components/Dashboard/SummaryTile";
 import { PasteMessage } from "@/components/PasteMessage/PasteMessage";
+import { LogOutButton } from "@/components/Auth/LogOutButton";
 
 interface DashboardViewProps {
   activeCards: Card[];
   onTileClick: (tileId: string) => void;
   onExtracted: () => void;
+  userEmail?: string;
 }
 
 function getGreeting(): string {
@@ -18,7 +20,7 @@ function getGreeting(): string {
   return "Good evening";
 }
 
-export function DashboardView({ activeCards, onTileClick, onExtracted }: DashboardViewProps) {
+export function DashboardView({ activeCards, onTileClick, onExtracted, userEmail }: DashboardViewProps) {
   const totalEmails = activeCards.length;
 
   return (
@@ -34,9 +36,20 @@ export function DashboardView({ activeCards, onTileClick, onExtracted }: Dashboa
             </span>
           )}
         </div>
-        <span className="text-[11px] text-gray-400">
-          {getGreeting().toLowerCase().replace("good ", "")} · updated just now
-        </span>
+        <div className="flex items-center gap-3">
+          {userEmail && (
+            <span
+              className="text-[11px] text-gray-400 hidden sm:inline"
+              title={userEmail}
+            >
+              {userEmail}
+            </span>
+          )}
+          <span className="text-[11px] text-gray-400">
+            {getGreeting().toLowerCase().replace("good ", "")} · updated just now
+          </span>
+          <LogOutButton />
+        </div>
       </div>
 
       <PasteMessage onExtracted={onExtracted} fullWidth />
@@ -58,6 +71,15 @@ export function DashboardView({ activeCards, onTileClick, onExtracted }: Dashboa
         })}
       </div>
 
+      {totalEmails === 0 && (
+        <div className="text-center py-10 px-6 border border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+          <p className="text-sm font-medium text-gray-600">No emails yet</p>
+          <p className="text-xs text-gray-400 mt-1.5 max-w-sm mx-auto leading-relaxed">
+            New Gmail messages will appear here after they arrive. You can also
+            paste a message above to classify it manually.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
