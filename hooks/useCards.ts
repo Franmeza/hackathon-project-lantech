@@ -18,8 +18,8 @@ interface UseCardsReturn {
   mutate: () => void;
 }
 
-const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL  ?? "";
-const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL        ?? "";
+const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
 
 // Realtime is only available when the anon key is configured
 const realtimeEnabled = Boolean(supabaseUrl && supabaseAnon);

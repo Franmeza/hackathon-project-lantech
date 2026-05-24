@@ -2,7 +2,7 @@ import { google } from "googleapis";
 import { prisma } from "@/lib/db";
 import { env } from "@/lib/env";
 
-function createOAuth2Client(accessToken: string, refreshToken?: string) {
+function createOAuth2Client(accessToken: string, refreshToken?: string, userId?: string) {
   const client = new google.auth.OAuth2(
     env.googleClientId,
     env.googleClientSecret
@@ -11,6 +11,27 @@ function createOAuth2Client(accessToken: string, refreshToken?: string) {
     access_token: accessToken,
     refresh_token: refreshToken,
   });
+
+  // When googleapis auto-refreshes an expired token, save the new one to the DB
+  // so the next webhook call doesn't need to refresh again.
+  if (userId) {
+    client.on("tokens", (tokens) => {
+      if (tokens.access_token) {
+        prisma.account
+          .updateMany({
+            where: { userId, provider: "google" },
+            data: {
+              access_token: tokens.access_token,
+              ...(tokens.expiry_date && {
+                expires_at: Math.floor(tokens.expiry_date / 1000),
+              }),
+            },
+          })
+          .catch((err) => console.error("Failed to persist refreshed token:", err));
+      }
+    });
+  }
+
   return client;
 }
 
@@ -72,9 +93,10 @@ function extractTextBody(
 export async function fetchGmailMessage(
   messageId: string,
   accessToken: string,
-  refreshToken?: string
+  refreshToken?: string,
+  userId?: string
 ): Promise<ParsedEmail> {
-  const auth = createOAuth2Client(accessToken, refreshToken);
+  const auth = createOAuth2Client(accessToken, refreshToken, userId);
   const gmail = google.gmail({ version: "v1", auth });
 
   const res = await gmail.users.messages.get({
@@ -110,7 +132,7 @@ export async function registerGmailWatch(
     return;
   }
 
-  const auth = createOAuth2Client(accessToken, refreshToken);
+  const auth = createOAuth2Client(accessToken, refreshToken, userId);
   const gmail = google.gmail({ version: "v1", auth });
 
   const res = await gmail.users.watch({
@@ -139,9 +161,10 @@ export async function registerGmailWatch(
 export async function getNewMessageIds(
   startHistoryId: string,
   accessToken: string,
-  refreshToken?: string
+  refreshToken?: string,
+  userId?: string
 ): Promise<string[]> {
-  const auth = createOAuth2Client(accessToken, refreshToken);
+  const auth = createOAuth2Client(accessToken, refreshToken, userId);
   const gmail = google.gmail({ version: "v1", auth });
 
   const res = await gmail.users.history.list({
