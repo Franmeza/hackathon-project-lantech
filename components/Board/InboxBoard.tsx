@@ -15,7 +15,7 @@ import { DashboardView } from "@/components/Dashboard/DashboardView";
 import { Button } from "@/components/ui/Button";
 import { Icon, TileIcon, type TileIconId } from "@/components/ui/Icon";
 import { RightPanel } from "@/components/RightPanel/RightPanel";
-import { layout, typography, functionalColors } from "@/lib/ui-tokens";
+import { layout, functionalColors } from "@/lib/ui-tokens";
 import type { Card, ColId } from "@/types";
 
 type MainView = "dashboard" | "archive";
@@ -217,6 +217,50 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     onDeleted: handleCardDeleted,
   };
 
+  const isDashboardHome = mainView === "dashboard" && !detailTileId;
+  const contentShell = isDashboardHome
+    ? layout.dashboardShell
+    : "flex-1 min-w-0 flex flex-col";
+
+  const bulkActionBar = selection.selectionMode ? (
+    <BulkActionBar
+      context={mainView === "archive" ? "archive" : "inbox"}
+      count={selection.selectedCount}
+      busy={bulkBusy}
+      onCancel={selection.exitMode}
+      onArchive={() => {
+        const title = `Archive ${selection.selectedCount} items?`;
+        const description =
+          "These items will move to Archive. You can restore them later.";
+        requestConfirm(title, description, handleBulkArchiveSelected);
+      }}
+      onRestore={() => {
+        const title = `Restore ${selection.selectedCount} items?`;
+        const description =
+          "These items will move back to your active board.";
+        requestConfirm(title, description, handleBulkRestoreSelected);
+      }}
+      onReclassify={(col) => {
+        const title = `Reclassify ${selection.selectedCount} items?`;
+        const description =
+          "This will change the category for the selected items.";
+        requestConfirm(title, description, () =>
+          handleBulkReclassifySelected(col)
+        );
+      }}
+      onDelete={
+        mainView !== "archive"
+          ? () => {
+              const title = `Delete ${selection.selectedCount} items?`;
+              const description =
+                "Linked Gmail messages will be moved to trash. This cannot be undone.";
+              requestConfirm(title, description, handleBulkDeleteSelected);
+            }
+          : undefined
+      }
+    />
+  ) : null;
+
   return (
     <div className="flex min-h-screen w-full font-sans">
       <Sidebar
@@ -227,45 +271,9 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
         userEmail={userEmail}
       />
 
-      <div className={layout.mainContent}>
-        {selection.selectionMode && (
-          <BulkActionBar
-            context={mainView === "archive" ? "archive" : "inbox"}
-            count={selection.selectedCount}
-            busy={bulkBusy}
-            onCancel={selection.exitMode}
-            onArchive={() => {
-              const title = `Archive ${selection.selectedCount} items?`;
-              const description =
-                "These items will move to Archive. You can restore them later.";
-              requestConfirm(title, description, handleBulkArchiveSelected);
-            }}
-            onRestore={() => {
-              const title = `Restore ${selection.selectedCount} items?`;
-              const description =
-                "These items will move back to your active board.";
-              requestConfirm(title, description, handleBulkRestoreSelected);
-            }}
-            onReclassify={(col) => {
-              const title = `Reclassify ${selection.selectedCount} items?`;
-              const description =
-                "This will change the category for the selected items.";
-              requestConfirm(title, description, () =>
-                handleBulkReclassifySelected(col)
-              );
-            }}
-            onDelete={
-              mainView !== "archive"
-                ? () => {
-                    const title = `Delete ${selection.selectedCount} items?`;
-                    const description =
-                      "Linked Gmail messages will be moved to trash. This cannot be undone.";
-                    requestConfirm(title, description, handleBulkDeleteSelected);
-                  }
-                : undefined
-            }
-          />
-        )}
+      <div className={contentShell}>
+        <div className={layout.mainContent}>
+          {bulkActionBar}
 
         {mainView === "archive" && (
           <div key="archive" className="page-enter">
@@ -296,35 +304,37 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
 
         {mainView === "dashboard" && detailTileId && detailTile && (
           <div key={`detail-${detailTileId}`} className="page-enter-detail">
-            <div className="flex items-center gap-3 mb-6">
-              <button
-                onClick={handleBackToDashboard}
-                className="flex items-center gap-1.5 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
-              >
-                <Icon name="chevron-left" size="sm" />
-                Back
-              </button>
-              <span className="text-gray-300">/</span>
-              <span className="flex items-center">
-                <TileIcon
-                  tileId={detailTileId as TileIconId}
-                  size="md"
-                  className="text-gray-700"
-                />
-              </span>
-              <h1 className={typography.pageTitle}>{detailTile.label}</h1>
-              <span
-                className={
-                  detailTile.id === "action"
-                    ? functionalColors.emailCount
-                    : functionalColors.detailEmailCountDefault
-                }
-              >
-                {detailCards.length} emails
-              </span>
+            <div className={layout.detailHeader}>
+              <div className={layout.detailHeaderMain}>
+                <button
+                  onClick={handleBackToDashboard}
+                  className="flex items-center gap-1.5 text-[13px] text-gray-400 hover:text-gray-700 transition-colors shrink-0"
+                >
+                  <Icon name="chevron-left" size="sm" />
+                  Back
+                </button>
+                <span className={layout.detailHeaderDivider}>/</span>
+                <span className="flex items-center shrink-0">
+                  <TileIcon
+                    tileId={detailTileId as TileIconId}
+                    size="md"
+                    className="text-gray-700"
+                  />
+                </span>
+                <h1 className={layout.detailHeaderTitle}>{detailTile.label}</h1>
+                <span
+                  className={
+                    (detailTile.id === "action"
+                      ? functionalColors.emailCount
+                      : functionalColors.detailEmailCountDefault) + " shrink-0"
+                  }
+                >
+                  {detailCards.length} emails
+                </span>
+              </div>
 
               {showDetailBulkActions && (
-                <div className="ml-auto flex items-center gap-2 shrink-0">
+                <div className={layout.detailHeaderActions}>
                   {!selection.selectionMode ? (
                     <>
                       <Button variant="toolbar" onClick={selection.enterMode}>
@@ -334,7 +344,8 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
                         variant="toolbar"
                         onClick={() => void handleQuickArchiveAll(detailTileId)}
                       >
-                        Archive all
+                        <span className="hidden sm:inline">Archive all</span>
+                        <span className="sm:hidden">Archive</span>
                       </Button>
                     </>
                   ) : (
@@ -383,11 +394,10 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
             )}
           </div>
         )}
-      </div>
+        </div>
 
-      {mainView === "dashboard" && !detailTileId && (
-        <RightPanel cards={activeCards} />
-      )}
+        {isDashboardHome && <RightPanel cards={activeCards} />}
+      </div>
 
       <BulkConfirmDialog
         open={confirm.open}

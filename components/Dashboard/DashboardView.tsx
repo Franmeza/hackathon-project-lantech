@@ -69,7 +69,7 @@ export function DashboardView({
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
           {userEmail && (
             <div
               className={`w-7 h-7 rounded-full ${avatarBg} flex items-center justify-center flex-shrink-0`}

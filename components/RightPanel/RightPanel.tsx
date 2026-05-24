@@ -1,6 +1,7 @@
 "use client";
 
 import type { Card } from "@/types";
+import { layout } from "@/lib/ui-tokens";
 
 interface RightPanelProps {
   cards: Card[];
@@ -91,7 +92,7 @@ export function RightPanel({ cards }: RightPanelProps) {
   };
 
   return (
-    <aside className="w-64 flex-shrink-0 border-l border-gray-100 sticky top-0 h-screen overflow-y-auto bg-gray-50/40 flex flex-col">
+    <aside className={layout.rightPanelShell + " flex flex-col"}>
       <div className="px-4 py-5 flex flex-col gap-5">
 
         {/* ── AI Overview ── */}

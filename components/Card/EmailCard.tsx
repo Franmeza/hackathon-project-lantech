@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { DotIndicator } from "@/components/ui/DotIndicator";
 import { Icon } from "@/components/ui/Icon";
 import { RelativeTime } from "@/components/ui/RelativeTime";
-import { functionalColors, typography, cardHoverBorderByCol } from "@/lib/ui-tokens";
+import { functionalColors, cardHoverBorderByCol, emailCardLayout, typography } from "@/lib/ui-tokens";
 import { MessageModal } from "@/components/Card/MessageModal";
 
 interface EmailCardProps {
@@ -118,16 +118,16 @@ export function EmailCard({
               className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-gray-200 bg-gray-50 text-gray-500 text-[10px] font-medium hover:bg-gray-100 hover:text-gray-700 hover:border-gray-300 transition-colors"
             >
               <Icon name="archive" size="xs" />
-              Archive
+              <span className="hidden sm:inline">Archive</span>
             </button>
           )}
 
           <div
             className={
-              "flex justify-between items-start mb-1.5 " + (hovered ? "pr-16" : "")
+              emailCardLayout.topRow + (hovered ? " sm:pr-16" : "")
             }
           >
-            <span className={"flex items-center gap-2 " + typography.senderName}>
+            <span className={emailCardLayout.senderRow + " " + typography.senderName}>
               {selectionMode && onToggleSelect && (
                 <Checkbox
                   checked={selected}
@@ -135,7 +135,7 @@ export function EmailCard({
                   label={`Select ${card.task}`}
                 />
               )}
-              <DotIndicator colorClass={cfg.dot} />
+              <DotIndicator colorClass={cfg.dot} className="mt-1 shrink-0" />
               <button
                 type="button"
                 onClick={(e) => {
@@ -143,22 +143,22 @@ export function EmailCard({
                   if (!selectionMode || !onToggleSelect) return;
                   onToggleSelect(card.id);
                 }}
-                className="text-left"
+                className={emailCardLayout.senderName}
               >
                 {card.sender}
               </button>
             </span>
             <RelativeTime
               date={card.createdAt}
-              className={typography.meta + " whitespace-nowrap ml-2"}
+              className={emailCardLayout.time}
             />
           </div>
 
-          <p className={typography.body + " mb-1.5"}>{card.task}</p>
+          <p className={emailCardLayout.task}>{card.task}</p>
 
-          <AiChip className="mb-2">{card.reason}</AiChip>
+          <AiChip className="mb-2 break-words">{card.reason}</AiChip>
 
-          <div className="flex gap-1.5 flex-wrap items-center">
+          <div className={emailCardLayout.actions}>
             {card.deadline && (
               <span className={functionalColors.deadline + " flex items-center gap-1"}>
                 <Icon name="clock" size="xs" />
@@ -183,7 +183,8 @@ export function EmailCard({
                 ) : (
                   <>
                     <Icon name="message-reply" size="xs" />
-                    Generate draft
+                    <span className="hidden sm:inline">Generate draft</span>
+                    <span className="sm:hidden">Draft</span>
                   </>
                 )}
               </button>
@@ -198,7 +199,10 @@ export function EmailCard({
                 className={functionalColors.draftReply + " inline-flex items-center gap-1"}
               >
                 <Icon name="message-reply" size="xs" />
-                {replyOpen ? "Hide draft" : "View draft"}
+                <span className="hidden sm:inline">
+                  {replyOpen ? "Hide draft" : "View draft"}
+                </span>
+                <span className="sm:hidden">{replyOpen ? "Hide" : "Draft"}</span>
               </button>
             )}
           </div>
@@ -226,7 +230,12 @@ export function EmailCard({
                   disabled={generating}
                   className="text-[11px] px-2 py-0.5 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50"
                 >
-                  {generating ? "Regenerating…" : "Regenerate"}
+                  {generating ? "…" : (
+                    <>
+                      <span className="hidden sm:inline">Regenerate</span>
+                      <span className="sm:hidden">Redo</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

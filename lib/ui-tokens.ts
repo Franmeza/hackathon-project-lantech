@@ -64,6 +64,21 @@ export const functionalColors = {
   errorText: "text-xs text-red-500 mt-1",
 } as const;
 
+/** Email card + column layout — detail views */
+export const emailCardLayout = {
+  topRow:
+    "flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between mb-1.5",
+  senderRow: "flex items-start gap-2 min-w-0",
+  senderName: "text-left break-words",
+  time: "text-[11px] text-gray-400 sm:ml-2 sm:whitespace-nowrap shrink-0",
+  task: "text-[13px] text-gray-800 leading-snug mb-1.5 break-words",
+  actions: "flex gap-1.5 flex-wrap items-center",
+  columnHeaderRow:
+    "flex flex-wrap items-center gap-2 mb-3.5 pb-3 border-b border-gray-100",
+  columnHeaderRight:
+    "ml-auto flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto",
+} as const;
+
 /** Action detail column headers — Overdue / Today / Upcoming */
 export const actionGroupHeaders = [
   {
@@ -262,29 +277,41 @@ export const actionUrgencyStyle = {
 
 /** Layout tokens */
 export const layout = {
-  mainContent: "flex-1 min-w-0 w-full px-10 py-8 max-w-6xl mx-auto",
+  mainContent:
+    "flex-1 min-w-0 w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-8 max-w-6xl mx-auto",
+  dashboardShell: "flex-1 min-w-0 flex flex-col lg:flex-row lg:items-start",
+  rightPanelShell:
+    "w-full flex-shrink-0 border-t border-gray-200 bg-gray-50/40 lg:w-64 lg:border-t-0 lg:border-l lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto",
   sidebar: sidebarLayout.shell,
-  dashboardSecondaryGrid: "grid grid-cols-3 gap-3 items-stretch",
-  actionDetailGrid: "grid grid-cols-3 gap-4",
-  detailColumnGridTwo: "grid gap-4 grid-cols-2",
-  detailColumnGridOne: "grid gap-4 grid-cols-1 max-w-md",
+  dashboardSecondaryGrid: "grid grid-cols-1 lg:grid-cols-3 gap-3 items-stretch",
+  actionDetailGrid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
+  detailColumnGridTwo: "grid gap-4 grid-cols-1 lg:grid-cols-2",
+  detailColumnGridOne: "grid gap-4 grid-cols-1 max-w-md lg:max-w-none",
+  detailHeader:
+    "flex flex-col gap-3 mb-6 lg:flex-row lg:items-center lg:justify-between",
+  detailHeaderMain: "flex flex-wrap items-center gap-x-2 gap-y-2 min-w-0",
+  detailHeaderTitle: "text-lg font-semibold text-gray-900 tracking-tight min-w-0",
+  detailHeaderActions:
+    "flex flex-wrap items-center gap-2 w-full lg:w-auto lg:ml-auto lg:justify-end",
+  detailHeaderDivider: "text-gray-300 hidden sm:inline",
 } as const;
 
 /** Dashboard tile layout */
 export const dashboardTileLayout = {
   heroCard:
     "group w-full text-left cursor-pointer transition-colors rounded-xl border-2 border-red-400 bg-white p-5 font-sans hover:border-red-500",
-  heroHeader: "flex items-start justify-between gap-4 mb-4",
+  heroHeader:
+    "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-4 mb-4",
   heroTitleBlock: "flex items-center gap-3.5 min-w-0",
   heroIcon:
     "w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-base shrink-0",
   heroTitle: "text-base font-semibold text-gray-900 leading-tight",
-  heroSubtitle: typography.subtitle + " mt-1",
-  statGrid: "flex gap-2 shrink-0",
+  heroSubtitle: typography.subtitle + " mt-1 hidden sm:block",
+  statGrid: "flex flex-wrap gap-2 w-full lg:w-auto lg:shrink-0",
   statBox: "flex flex-col items-center justify-center rounded-lg px-3 py-2 min-w-[68px]",
   statNumber: "text-lg font-semibold leading-none",
   statLabel: "text-[10px] text-gray-500 mt-0.5",
-  previewList: "flex flex-col gap-2",
+  previewList: "hidden lg:flex flex-col gap-2",
   previewRow:
     "flex items-center gap-2.5 rounded-lg bg-gray-50 px-3 py-2.5",
   previewAvatar:
@@ -302,14 +329,14 @@ export const dashboardTileLayout = {
   categoryIcon:
     "w-7 h-7 rounded-lg flex items-center justify-center text-sm shrink-0",
   categoryTitle: "text-sm font-semibold text-gray-900 truncate",
-  categorySubtitle: typography.subtitle + " mt-1.5",
-  categoryPreviewList: "flex flex-col gap-2 flex-1",
+  categorySubtitle: typography.subtitle + " mt-1.5 hidden sm:block",
+  categoryPreviewList: "hidden lg:flex flex-col gap-2 flex-1",
   categoryPreviewRow:
     "flex items-start gap-2.5 rounded-lg bg-gray-50 px-3 py-2.5",
   categoryPreviewDot: "mt-1 shrink-0",
   categoryPreviewSender: "text-xs font-semibold text-gray-900 truncate",
   categoryPreviewTask: "text-[11px] text-gray-500 truncate",
-  categoryFooter: "flex justify-end mt-4 pt-1",
+  categoryFooter: "flex justify-end mt-3 lg:mt-4 pt-1",
   categoryLink: "text-[11px] font-medium transition-colors",
   heroFooter: "flex justify-end mt-3 pt-1",
   heroLink: "text-[11px] font-medium text-red-600 group-hover:text-red-700 transition-colors",

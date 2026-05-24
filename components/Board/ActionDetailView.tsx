@@ -5,7 +5,7 @@ import { EmailCard } from "@/components/Card/EmailCard";
 import { ColumnHeader } from "@/components/ui/ColumnHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { isTodayDeadline } from "@/lib/dashboard-utils";
-import { actionGroupHeaders } from "@/lib/ui-tokens";
+import { actionGroupHeaders, layout } from "@/lib/ui-tokens";
 
 interface ActionDetailViewProps {
   cards: Card[];
@@ -48,7 +48,7 @@ export function ActionDetailView({
   exitingIds,
 }: ActionDetailViewProps) {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className={layout.actionDetailGrid}>
       {actionGroupHeaders.map((group) => {
         const groupCards = filterGroupCards(group.id, cards);
         return (

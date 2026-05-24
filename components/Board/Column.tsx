@@ -65,7 +65,8 @@ export function Column({
               variant="toolbar"
               onClick={() => onArchiveAll(cards.map((c) => c.id))}
             >
-              Archive all
+              <span className="hidden sm:inline">Archive all</span>
+              <span className="sm:hidden">All</span>
             </Button>
           ) : null
         }

@@ -157,7 +157,7 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
     <div
       ref={backdropRef}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4"
       style={{
         backdropFilter: "blur(3px)",
         background: visible ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0)",
@@ -165,7 +165,7 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
       }}
     >
       <div
-        className="relative w-full max-w-[46rem] max-h-[88vh] flex flex-col bg-white rounded-2xl border border-gray-200 font-sans overflow-hidden transition-all duration-150"
+        className="relative w-full max-w-[46rem] max-h-[92vh] sm:max-h-[88vh] flex flex-col bg-white rounded-t-2xl sm:rounded-2xl border border-gray-200 font-sans overflow-hidden transition-all duration-150"
         style={{
           boxShadow: "0 24px 60px -12px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.04)",
           opacity: visible ? 1 : 0,
@@ -173,9 +173,10 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
         }}
       >
         {/* ── Header ── */}
-        <div className="px-6 pt-5 pb-4 border-b border-gray-100">
-          <div className="flex items-start gap-4">
+        <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-4 border-b border-gray-100">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
             {/* Avatar */}
+            <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
             <div
               className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-semibold text-white select-none"
               style={{ background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)" }}
@@ -185,22 +186,23 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
 
             {/* Meta */}
             <div className="flex-1 min-w-0 pt-0.5">
-              <div className="flex items-baseline gap-2 flex-wrap">
-                <span className="text-[13px] font-semibold text-gray-900 leading-none">
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-2">
+                <span className="text-[13px] font-semibold text-gray-900 leading-snug break-words">
                   {sender.name}
                 </span>
                 {sender.email !== sender.name && (
-                  <span className="text-[11px] text-gray-400 truncate">{sender.email}</span>
+                  <span className="text-[11px] text-gray-400 break-all">{sender.email}</span>
                 )}
               </div>
-              <h2 className="text-[15px] font-semibold text-gray-900 leading-snug mt-2">
+              <h2 className="text-[15px] font-semibold text-gray-900 leading-snug mt-2 break-words">
                 {subject}
               </h2>
               <p className="text-[11px] text-gray-400 mt-1">{dateStr}</p>
             </div>
+            </div>
 
             {/* Actions */}
-            <div className="shrink-0 flex items-center gap-1.5 pt-0.5">
+            <div className="shrink-0 flex items-center gap-1.5 self-end sm:self-start sm:pt-0.5">
               {gmailLink && (
                 <a
                   href={gmailLink}
@@ -262,7 +264,7 @@ export function MessageModal({ card, onClose, onArchive, onDeleted }: MessageMod
         </div>
 
         {/* ── Body ── */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 scroll-smooth">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5 scroll-smooth">
 
           {deleteError && (
             <div className="mb-4 flex items-center gap-2 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-4 py-3">

@@ -30,12 +30,12 @@ export function BulkActionBar({
 
   return (
     <div className="sticky top-0 z-20 -mx-2 mb-4 px-2">
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 flex items-center gap-2">
-        <span className="text-[11px] text-gray-500 font-medium">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 flex flex-wrap items-center gap-2">
+        <span className="text-[11px] text-gray-500 font-medium shrink-0">
           {count} selected
         </span>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto sm:ml-auto">
           {context === "inbox" ? (
             <>
               <Button variant="secondary" onClick={onArchive} disabled={busy}>
