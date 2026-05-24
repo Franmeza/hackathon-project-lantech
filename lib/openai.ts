@@ -25,8 +25,8 @@ Column rules (pick exactly one "col"):
   Set "deadline" carefully — the UI splits action items into sub-groups:
   • Today — deadline contains "today" or "eod" (e.g. "Today", "Today EOD", "EOD today", "Expiration time/date")
   • Upcoming — any other deadline (e.g. "Next Friday", "By May 30") OR null if no deadline is mentioned
-- "overdue" — Action Required > Overdue: missed deadline, unanswered follow-up, second/nudge email, or sender waiting on you after a due date passed. Always prefer "overdue" over "action" when the sender is chasing you or time has run out.
-- "invoice" — Invoices: bills, payment receipts, invoices, payment due notices, or charges from Stripe, AWS, SaaS vendors, contractors, or any billing system.
+- "overdue" — Action Required > Overdue: missed deadline, unanswered follow-up, payment due notices, second/nudge email, or sender waiting on you after a due date passed. Always prefer "overdue" over "action" when the sender is chasing you or time has run out.
+- "invoice" — Invoices: bills, payment receipts, invoices, or charges from Stripe, AWS, SaaS vendors, contractors, or any billing system.
 - "sub" — Subscriptions: newsletters, marketing, digests, promotions, product updates, or automated non-financial notifications. No action needed.
 - "other" — FYI: informational only — someone sharing context, updates, or awareness items with no response expected.
 
@@ -71,7 +71,7 @@ export async function classifyEmail(
   body: string
 ): Promise<ClassifyResult> {
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-5-mini",
     temperature: 0.2,
     response_format: { type: "json_object" },
     messages: [
