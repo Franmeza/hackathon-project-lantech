@@ -4,8 +4,10 @@ import { useState } from "react";
 import type { Card, ColConfigMap } from "@/types";
 import { AiChip } from "@/components/ui/AiChip";
 import { Card as UiCard } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { DotIndicator } from "@/components/ui/DotIndicator";
 import { Icon } from "@/components/ui/Icon";
+import { RelativeTime } from "@/components/ui/RelativeTime";
 import { functionalColors, typography, cardHoverBorderByCol } from "@/lib/ui-tokens";
 
 interface EmailCardProps {
@@ -14,6 +16,9 @@ interface EmailCardProps {
   onDragStart: (e: React.DragEvent, id: string) => void;
   onDragEnd: () => void;
   onArchive: (id: string) => void;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 export function EmailCard({
@@ -22,6 +27,9 @@ export function EmailCard({
   onDragStart,
   onDragEnd,
   onArchive,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
 }: EmailCardProps) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [draft, setDraft] = useState<string | null>(card.reply);
@@ -57,10 +65,11 @@ export function EmailCard({
   }
 
   const borderClass = hovered ? cardHoverBorderByCol[card.col] : "border-gray-200";
+  const showArchiveButton = hovered && !selectionMode;
 
   return (
     <UiCard
-      draggable
+      draggable={!selectionMode}
       borderClass={borderClass}
       className="cursor-grab transition-colors relative"
       onDragStart={(e) => onDragStart(e, card.id)}
@@ -68,7 +77,7 @@ export function EmailCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {hovered && (
+      {showArchiveButton && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -87,13 +96,30 @@ export function EmailCard({
           "flex justify-between items-start mb-1.5 " + (hovered ? "pr-16" : "")
         }
       >
-        <span className={"flex items-center gap-1.5 " + typography.senderName}>
+        <span className={"flex items-center gap-2 " + typography.senderName}>
+          {selectionMode && onToggleSelect && (
+            <Checkbox
+              checked={selected}
+              onChange={() => onToggleSelect(card.id)}
+              label={`Select ${card.task}`}
+            />
+          )}
           <DotIndicator colorClass={cfg.dot} />
-          {card.sender}
+          <button
+            type="button"
+            onClick={() => {
+              if (!selectionMode || !onToggleSelect) return;
+              onToggleSelect(card.id);
+            }}
+            className="text-left"
+          >
+            {card.sender}
+          </button>
         </span>
-        <span className={typography.meta + " whitespace-nowrap ml-2"}>
-          {card.time}
-        </span>
+        <RelativeTime
+          date={card.createdAt}
+          className={typography.meta + " whitespace-nowrap ml-2"}
+        />
       </div>
 
       <p className={typography.body + " mb-1.5"}>{card.task}</p>

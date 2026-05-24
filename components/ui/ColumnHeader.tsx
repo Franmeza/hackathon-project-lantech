@@ -11,6 +11,7 @@ interface ColumnHeaderProps {
   pillBorder?: string;
   showDot?: boolean;
   className?: string;
+  right?: React.ReactNode;
 }
 
 export function ColumnHeader({
@@ -22,6 +23,7 @@ export function ColumnHeader({
   pillBorder = "",
   showDot = true,
   className = "",
+  right,
 }: ColumnHeaderProps) {
   return (
     <div
@@ -32,6 +34,7 @@ export function ColumnHeader({
       <Pill bg={pillBg} text={pillText} border={pillBorder}>
         {count}
       </Pill>
+      {right && <span className="ml-auto flex items-center gap-2">{right}</span>}
     </div>
   );
 }

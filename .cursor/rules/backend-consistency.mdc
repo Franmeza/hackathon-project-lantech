@@ -1,0 +1,38 @@
+---
+description: Backend/API consistency guardrails — preserve HTTP contracts, confirm before changing
+globs: "**/{app/api,lib}/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Backend Consistency
+
+When editing API routes (`app/api/`) or server libraries (`lib/`):
+
+1. Consult `.cursor/skills/backend-consistency/STANDARDS.md` before making backend changes.
+2. Protected routes must call `auth()` and return `401` with `{ error: "Unauthorized" }` when unauthenticated.
+3. User-scoped Prisma queries must filter by `userId: session.user.id` before update/delete.
+4. Error responses must use `{ error: string }` with appropriate status (`400`, `401`, `404`).
+5. Business logic belongs in `lib/*`, not duplicated across route handlers.
+6. Server env vars should be read via `lib/env.ts` (exceptions: `auth.config.ts`, `lib/db.ts`).
+7. **Do not change HTTP contracts** (status codes, JSON shapes, field names) without a confirmed Change Proposal.
+8. **Propose changes and wait for user confirmation** before editing (see `backend-consistency` skill).
+9. Webhook `/api/webhook/gmail` follows Pub/Sub idempotency rules — see STANDARDS.md.
+10. After significant backend changes, run:
+    ```bash
+    npm run validate:backend
+    npm run typecheck
+    npm run build
+    ```
+
+Also applies when editing `auth.ts`, `auth.config.ts`, or `proxy.ts` — follow the same skill.
+
+## Public routes (proxy.ts)
+
+- `/sign-in`, `/api/auth/*`, `/api/webhook/gmail` — no session required
+- All other `/api/*` — session required
+
+## Canonical patterns
+
+- Auth: `requireSession()` pattern in `app/api/cards/route.ts`
+- Serialization: `serializeCard` in `app/api/cards/route.ts`
+- Types: `types/index.ts` (`Card`, `ColId`, `SenderType`)

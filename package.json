@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "start": "next start"
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "validate:backend": "node .cursor/skills/backend-consistency/scripts/validate-backend.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

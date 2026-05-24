@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { layout, sidebarLayout } from "@/lib/ui-tokens";
 import { ProfileMenu } from "@/components/Auth/ProfileMenu";
+import { SidebarBrand } from "@/components/Sidebar/SidebarBrand";
 
 export type ViewId = "inbox" | "archive";
 export type SidebarMode = "expanded" | "collapsed" | "expand-on-hover";
@@ -111,6 +112,10 @@ export function Sidebar({
         (hydrated ? "" : " " + sidebarLayout.expandedWidth)
       }
     >
+      <SidebarBrand
+        isExpanded={isExpanded}
+        onClick={() => onNavigate("inbox")}
+      />
       <nav className={sidebarLayout.navList}>
         {NAV_ITEMS.map((item) => {
           const isActive = view === item.id;

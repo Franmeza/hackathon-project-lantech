@@ -3,6 +3,7 @@
 import type { Card, ColId, ColConfigMap } from "@/types";
 import { EmailCard } from "@/components/Card/EmailCard";
 import { ColumnHeader } from "@/components/ui/ColumnHeader";
+import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { dropZoneActiveByCol } from "@/lib/ui-tokens";
 
@@ -17,6 +18,10 @@ interface ColumnProps {
   onDragLeave: () => void;
   onDrop: (e: React.DragEvent, colId: ColId) => void;
   onArchive: (id: string) => void;
+  selectionMode?: boolean;
+  isSelected?: (id: string) => boolean;
+  onToggleSelect?: (id: string) => void;
+  onArchiveAll?: (ids: string[]) => void;
 }
 
 export function Column({
@@ -30,6 +35,10 @@ export function Column({
   onDragLeave,
   onDrop,
   onArchive,
+  selectionMode = false,
+  isSelected,
+  onToggleSelect,
+  onArchiveAll,
 }: ColumnProps) {
   const cfg = config[colId];
   const isOver = dragOver === colId;
@@ -48,12 +57,22 @@ export function Column({
         pillBg={cfg.pillBg}
         pillText={cfg.pillText}
         pillBorder={cfg.pillBorder}
+        right={
+          cards.length > 0 && onArchiveAll && !selectionMode ? (
+            <Button
+              variant="toolbar"
+              onClick={() => onArchiveAll(cards.map((c) => c.id))}
+            >
+              Archive all
+            </Button>
+          ) : null
+        }
       />
 
       <div
         onDragOver={(e) => {
           e.preventDefault();
-          onDragOver(colId);
+          if (!selectionMode) onDragOver(colId);
         }}
         onDragLeave={onDragLeave}
         onDrop={(e) => onDrop(e, colId)}
@@ -67,6 +86,9 @@ export function Column({
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onArchive={onArchive}
+            selectionMode={selectionMode}
+            selected={isSelected ? isSelected(card.id) : false}
+            onToggleSelect={onToggleSelect}
           />
         ))}
         {cards.length === 0 && <EmptyState>Drop cards here</EmptyState>}

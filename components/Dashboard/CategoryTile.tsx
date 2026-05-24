@@ -26,9 +26,7 @@ export function CategoryTile({ tile, cards, onClick }: CategoryTileProps) {
   const previews = cards.slice(0, PREVIEW_LIMIT);
 
   return (
-    <button
-      type="button"
-      onClick={() => onClick(tile.id)}
+    <div
       className={
         dashboardTileLayout.categoryCard +
         " " +
@@ -37,7 +35,12 @@ export function CategoryTile({ tile, cards, onClick }: CategoryTileProps) {
         identity.hoverBorder
       }
     >
-      <div className={dashboardTileLayout.categoryHeader}>
+      <button
+        type="button"
+        onClick={() => onClick(tile.id)}
+        className="w-full text-left flex flex-col flex-1"
+      >
+        <div className={dashboardTileLayout.categoryHeader}>
         <div className={dashboardTileLayout.categoryTitleRow}>
           <div className={dashboardTileLayout.categoryTitleBlock}>
             <span
@@ -87,6 +90,7 @@ export function CategoryTile({ tile, cards, onClick }: CategoryTileProps) {
       ) : (
         <p className="text-[11px] text-gray-400 flex-1">No items yet</p>
       )}
+      </button>
 
       <div className={dashboardTileLayout.categoryFooter}>
         <span
@@ -97,6 +101,6 @@ export function CategoryTile({ tile, cards, onClick }: CategoryTileProps) {
           View all {cards.length} →
         </span>
       </div>
-    </button>
+    </div>
   );
 }

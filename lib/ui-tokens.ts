@@ -132,7 +132,14 @@ export const sidebarLayout = {
     "flex-shrink-0 flex flex-col border-r bg-zinc-800 border-zinc-700 transition-[width] duration-200 ease-in-out min-h-screen",
   expandedWidth: "w-44",
   collapsedWidth: "w-14",
-  navList: "flex flex-col gap-1 px-2 pt-3 w-full",
+  brand:
+    "w-full flex items-center gap-2.5 px-2.5 pt-3 pb-2 text-left transition-colors hover:opacity-90",
+  brandCollapsed: "justify-center px-2",
+  brandLogoWrap:
+    "h-8 w-8 flex items-center justify-center shrink-0 overflow-hidden",
+  brandLogo: "h-7 w-7 object-contain",
+  brandLabel: "text-[13px] font-semibold text-zinc-100 truncate leading-none",
+  navList: "flex flex-col gap-1 px-2 pt-1 w-full",
   navButtonBase:
     "relative rounded-xl flex items-center transition-colors",
   navButtonExpanded:

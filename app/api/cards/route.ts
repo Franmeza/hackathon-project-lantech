@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/db";
 import { classifyEmail } from "@/lib/openai";
 import type { Card } from "@/types";
@@ -32,14 +32,6 @@ function serializeCard(card: {
     gmailMsgId: card.gmailMsgId,
     createdAt: card.createdAt.toISOString(),
   };
-}
-
-async function requireSession() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return null;
-  }
-  return session;
 }
 
 // GET /api/cards — return cards for the signed-in user

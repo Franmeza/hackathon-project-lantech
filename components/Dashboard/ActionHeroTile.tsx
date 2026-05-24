@@ -3,6 +3,7 @@
 import type { Card } from "@/types";
 import { Pill } from "@/components/ui/Pill";
 import { TileIcon } from "@/components/ui/Icon";
+import { RelativeTime } from "@/components/ui/RelativeTime";
 import {
   actionUrgencyStyle,
   dashboardTileLayout,
@@ -69,9 +70,10 @@ function PreviewRow({ card }: { card: Card }) {
         >
           {urgencyLabel(urgency)}
         </Pill>
-        <span className={dashboardTileLayout.previewTime + " " + style.time}>
-          {card.time}
-        </span>
+        <RelativeTime
+          date={card.createdAt}
+          className={dashboardTileLayout.previewTime + " " + style.time}
+        />
       </div>
     </div>
   );

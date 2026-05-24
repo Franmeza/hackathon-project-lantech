@@ -3,6 +3,7 @@
 import type { Card, ColConfigMap } from "@/types";
 import { EmailCard } from "@/components/Card/EmailCard";
 import { ColumnHeader } from "@/components/ui/ColumnHeader";
+import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { isTodayDeadline } from "@/lib/dashboard-utils";
 import { actionGroupHeaders } from "@/lib/ui-tokens";
@@ -13,6 +14,10 @@ interface ActionDetailViewProps {
   onDragStart: (e: React.DragEvent, id: string) => void;
   onDragEnd: () => void;
   onArchive: (id: string) => void;
+  selectionMode?: boolean;
+  isSelected?: (id: string) => boolean;
+  onToggleSelect?: (id: string) => void;
+  onArchiveGroup?: (ids: string[]) => void;
 }
 
 function filterGroupCards(groupId: string, cards: Card[]): Card[] {
@@ -38,6 +43,10 @@ export function ActionDetailView({
   onDragStart,
   onDragEnd,
   onArchive,
+  selectionMode = false,
+  isSelected,
+  onToggleSelect,
+  onArchiveGroup,
 }: ActionDetailViewProps) {
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -52,6 +61,16 @@ export function ActionDetailView({
               pillBg={group.pillBg}
               pillText={group.pillText}
               pillBorder={group.pillBorder}
+              right={
+                groupCards.length > 0 && onArchiveGroup && !selectionMode ? (
+                  <Button
+                    variant="toolbar"
+                    onClick={() => onArchiveGroup(groupCards.map((c) => c.id))}
+                  >
+                    Archive all
+                  </Button>
+                ) : null
+              }
             />
             <div className="min-h-44">
               {groupCards.map((card) => (
@@ -62,6 +81,9 @@ export function ActionDetailView({
                   onDragStart={onDragStart}
                   onDragEnd={onDragEnd}
                   onArchive={onArchive}
+                  selectionMode={selectionMode}
+                  selected={isSelected ? isSelected(card.id) : false}
+                  onToggleSelect={onToggleSelect}
                 />
               ))}
               {groupCards.length === 0 && <EmptyState>None</EmptyState>}

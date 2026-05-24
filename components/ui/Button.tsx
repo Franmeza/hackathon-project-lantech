@@ -1,4 +1,4 @@
-type ButtonVariant = "primary" | "secondary" | "ghost" | "inline";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "inline" | "toolbar";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -14,6 +14,8 @@ const variantClasses: Record<ButtonVariant, string> = {
     "text-[13px] px-3.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors",
   inline:
     "text-[10px] px-2 py-0.5 rounded-md border border-gray-200 text-gray-500 font-medium hover:border-gray-300 hover:text-gray-700 transition-colors",
+  toolbar:
+    "inline-flex items-center justify-center h-7 px-2.5 text-[11px] font-medium rounded-md bg-gray-700 text-white border border-gray-700 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0",
 };
 
 export function Button({

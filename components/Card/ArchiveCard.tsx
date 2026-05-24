@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Card, ColConfigMap } from "@/types";
 import { Card as UiCard } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { DotIndicator } from "@/components/ui/DotIndicator";
 import { Icon } from "@/components/ui/Icon";
 import { Pill } from "@/components/ui/Pill";
@@ -12,9 +13,19 @@ interface ArchiveCardProps {
   card: Card;
   colConfig: ColConfigMap;
   onRestore: (id: string) => void;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
-export function ArchiveCard({ card, colConfig, onRestore }: ArchiveCardProps) {
+export function ArchiveCard({
+  card,
+  colConfig,
+  onRestore,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
+}: ArchiveCardProps) {
   const [replyOpen, setReplyOpen] = useState(false);
   const cfg = colConfig[card.col];
 
@@ -22,6 +33,13 @@ export function ArchiveCard({ card, colConfig, onRestore }: ArchiveCardProps) {
     <UiCard variant="archived">
       <div className="flex justify-between items-start mb-1.5">
         <div className="flex items-center gap-1.5">
+          {selectionMode && onToggleSelect && (
+            <Checkbox
+              checked={selected}
+              onChange={() => onToggleSelect(card.id)}
+              label={`Select ${card.task}`}
+            />
+          )}
           <DotIndicator colorClass={cfg.dot} />
           <span className={typography.senderNameMuted}>{card.sender}</span>
           <Pill small bg={cfg.pillBg} text={cfg.pillText} border={cfg.pillBorder}>
@@ -30,12 +48,14 @@ export function ArchiveCard({ card, colConfig, onRestore }: ArchiveCardProps) {
         </div>
         <div className="flex items-center gap-1.5">
           <span className={typography.meta}>{card.time}</span>
-          <button
-            onClick={() => onRestore(card.id)}
-            className="text-[10px] px-2 py-0.5 rounded-md border border-gray-200 text-gray-500 font-medium hover:border-gray-300 hover:text-gray-700 transition-colors"
-          >
-            Restore
-          </button>
+          {!selectionMode && (
+            <button
+              onClick={() => onRestore(card.id)}
+              className="text-[10px] px-2 py-0.5 rounded-md border border-gray-200 text-gray-500 font-medium hover:border-gray-300 hover:text-gray-700 transition-colors"
+            >
+              Restore
+            </button>
+          )}
         </div>
       </div>
 

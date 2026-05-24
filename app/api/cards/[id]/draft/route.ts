@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/db";
 import { generateDraftReply } from "@/lib/openai";
 import { fetchGmailMessage, getAccountTokens } from "@/lib/gmail";
@@ -8,8 +8,8 @@ export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await requireSession();
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
