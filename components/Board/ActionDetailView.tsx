@@ -4,6 +4,7 @@ import type { Card, ColConfigMap } from "@/types";
 import { EmailCard } from "@/components/Card/EmailCard";
 import { ColumnHeader } from "@/components/ui/ColumnHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { isTodayDeadline } from "@/lib/dashboard-utils";
 import { actionGroupHeaders } from "@/lib/ui-tokens";
 
 interface ActionDetailViewProps {
@@ -14,23 +15,20 @@ interface ActionDetailViewProps {
   onArchive: (id: string) => void;
 }
 
-function isToday(deadline: string): boolean {
-  const d = deadline.toLowerCase();
-  return d.includes("today") || d.includes("eod");
-}
-
 function filterGroupCards(groupId: string, cards: Card[]): Card[] {
   if (groupId === "overdue") {
     return cards.filter((c) => c.col === "overdue");
   }
   if (groupId === "today") {
     return cards.filter(
-      (c) => c.col === "action" && c.deadline !== null && isToday(c.deadline)
+      (c) =>
+        c.col === "action" && c.deadline !== null && isTodayDeadline(c.deadline)
     );
   }
   return cards.filter(
     (c) =>
-      c.col === "action" && (c.deadline === null || !isToday(c.deadline))
+      c.col === "action" &&
+      (c.deadline === null || !isTodayDeadline(c.deadline))
   );
 }
 

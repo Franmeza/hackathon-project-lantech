@@ -39,6 +39,7 @@ export default async function HomePage() {
     <main className={"min-h-screen flex " + surfaces.page}>
       <InboxBoard
         initialCards={initialCards}
+        userName={session.user.name ?? undefined}
         userEmail={session.user.email ?? undefined}
       />
     </main>

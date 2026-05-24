@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import { functionalColors, surfaces } from "@/lib/ui-tokens";
 
 interface PasteMessageProps {
@@ -43,7 +44,10 @@ export function PasteMessage({ onExtracted, fullWidth = false }: PasteMessagePro
     <div className={fullWidth ? "w-full" : undefined}>
       <div className={fullWidth ? "flex justify-end" : undefined}>
         <Button variant="secondary" onClick={() => setOpen((v) => !v)}>
-          ✦ Paste message
+          <span className="inline-flex items-center gap-1.5">
+            <Icon name="clipboard-text" size="sm" />
+            Paste message
+          </span>
         </Button>
       </div>
 

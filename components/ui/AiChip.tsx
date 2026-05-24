@@ -1,4 +1,5 @@
 import { surfaces } from "@/lib/ui-tokens";
+import { Icon } from "@/components/ui/Icon";
 
 interface AiChipProps {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ export function AiChip({ children, className = "", padding = "default" }: AiChip
     <div
       className={surfaces.insetChip + " " + py + " " + className}
     >
-      <span className="opacity-50 flex-shrink-0">✦</span>
+      <Icon name="sparkles" size="xs" className="opacity-50" />
       <span className="leading-snug">{children}</span>
     </div>
   );

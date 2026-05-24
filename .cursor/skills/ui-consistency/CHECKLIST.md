@@ -23,6 +23,8 @@ Use after running `node .cursor/skills/ui-consistency/scripts/validate-ui.mjs`.
 - [ ] Empty states use `<EmptyState>`
 - [ ] Column headers use `<ColumnHeader>`
 - [ ] Buttons use `<Button>` with correct variant
+- [ ] Icons use `<Icon>` or `<TileIcon>` from `components/ui/Icon` (Tabler only)
+- [ ] No inline `<svg>`, emoji icons, or direct `@tabler/icons-react` imports
 
 ## Patterns
 

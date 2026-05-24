@@ -5,6 +5,7 @@ import type { Card, ColConfigMap } from "@/types";
 import { AiChip } from "@/components/ui/AiChip";
 import { Card as UiCard } from "@/components/ui/Card";
 import { DotIndicator } from "@/components/ui/DotIndicator";
+import { Icon } from "@/components/ui/Icon";
 import { functionalColors, typography, cardHoverBorderByCol } from "@/lib/ui-tokens";
 
 interface EmailCardProps {
@@ -14,23 +15,6 @@ interface EmailCardProps {
   onDragEnd: () => void;
   onArchive: (id: string) => void;
 }
-
-const ArchiveIcon = () => (
-  <svg
-    width="11"
-    height="11"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="21 8 21 21 3 21 3 8" />
-    <rect x="1" y="3" width="22" height="5" />
-    <line x1="10" y1="12" x2="14" y2="12" />
-  </svg>
-);
 
 export function EmailCard({
   card,
@@ -74,7 +58,7 @@ export function EmailCard({
           title="Archive"
           className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-gray-200 bg-gray-50 text-gray-500 text-[10px] font-medium hover:bg-gray-100 hover:text-gray-700 hover:border-gray-300 transition-colors"
         >
-          <ArchiveIcon />
+          <Icon name="archive" size="xs" />
           Archive
         </button>
       )}
@@ -100,15 +84,17 @@ export function EmailCard({
       <div className="flex gap-1.5 flex-wrap">
         {card.deadline && (
           <span className={functionalColors.deadline + " flex items-center gap-1"}>
-            ⏰ {card.deadline}
+            <Icon name="clock" size="xs" />
+            {card.deadline}
           </span>
         )}
         {card.reply && (
           <button
             onClick={() => setReplyOpen((v) => !v)}
-            className={functionalColors.draftReply}
+            className={functionalColors.draftReply + " inline-flex items-center gap-1"}
           >
-            ✉ {replyOpen ? "Hide reply" : "Draft reply"}
+            <Icon name="message-reply" size="xs" />
+            {replyOpen ? "Hide reply" : "Draft reply"}
           </button>
         )}
       </div>

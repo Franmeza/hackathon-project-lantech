@@ -17,7 +17,8 @@ All output, documentation, and code comments must be in **English**.
 ## Hard constraints
 
 - **NEVER edit code without a confirmed Change Proposal.**
-- NEVER change colors, sizes, spacing, product copy, icons, or layout.
+- NEVER change colors, sizes, spacing, product copy, or layout without approval.
+- Icons must use Tabler via `components/ui/Icon` — register new icons there only.
 - NEVER add UI libraries (shadcn, Radix, MUI, etc.).
 - NEVER suggest UX improvements — only align to [STANDARDS.md](STANDARDS.md).
 - Flag known inconsistencies as **report-only** until the user approves a visual change.

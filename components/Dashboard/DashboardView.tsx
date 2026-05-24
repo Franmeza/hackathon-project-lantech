@@ -2,17 +2,18 @@
 
 import type { Card } from "@/types";
 import { TILE_DEFINITIONS } from "@/lib/col-config";
-import { SummaryTile } from "@/components/Dashboard/SummaryTile";
+import { ActionHeroTile } from "@/components/Dashboard/ActionHeroTile";
+import { CategoryTile } from "@/components/Dashboard/CategoryTile";
 import { PasteMessage } from "@/components/PasteMessage/PasteMessage";
 import { functionalColors, layout, surfaces, typography } from "@/lib/ui-tokens";
-import { LogOutButton } from "@/components/Auth/LogOutButton";
 
 interface DashboardViewProps {
   activeCards: Card[];
   onTileClick: (tileId: string) => void;
   onExtracted: () => void;
-  userEmail?: string;
 }
+
+const SECONDARY_TILE_IDS = ["invoice", "other", "sub"] as const;
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -21,8 +22,17 @@ function getGreeting(): string {
   return "Good evening";
 }
 
-export function DashboardView({ activeCards, onTileClick, onExtracted, userEmail }: DashboardViewProps) {
+export function DashboardView({ activeCards, onTileClick, onExtracted }: DashboardViewProps) {
   const totalEmails = activeCards.length;
+
+  const actionTile = TILE_DEFINITIONS.find((t) => t.id === "action");
+  const actionCards = actionTile
+    ? activeCards.filter((c) => actionTile.cols.includes(c.col))
+    : [];
+
+  const secondaryTiles = SECONDARY_TILE_IDS.map((id) =>
+    TILE_DEFINITIONS.find((t) => t.id === id)
+  ).filter((t): t is NonNullable<typeof t> => t !== undefined);
 
   return (
     <div className="flex flex-col gap-3">
@@ -33,29 +43,25 @@ export function DashboardView({ activeCards, onTileClick, onExtracted, userEmail
             <span className={functionalColors.emailCount}>{totalEmails} emails</span>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          {userEmail && (
-            <span
-              className={typography.meta + " hidden sm:inline"}
-              title={userEmail}
-            >
-              {userEmail}
-            </span>
-          )}
-          <span className={typography.meta}>
-            {getGreeting().toLowerCase().replace("good ", "")} · updated just now
-          </span>
-          <LogOutButton />
-        </div>
+        <span className={typography.meta}>
+          {getGreeting().toLowerCase().replace("good ", "")} · updated just now
+        </span>
       </div>
 
       <PasteMessage onExtracted={onExtracted} fullWidth />
 
-      <div className={layout.dashboardGrid}>
-        {TILE_DEFINITIONS.map((tile) => {
+      {actionTile && (
+        <ActionHeroTile
+          cards={actionCards}
+          onClick={() => onTileClick("action")}
+        />
+      )}
+
+      <div className={layout.dashboardSecondaryGrid}>
+        {secondaryTiles.map((tile) => {
           const tileCards = activeCards.filter((c) => tile.cols.includes(c.col));
           return (
-            <SummaryTile
+            <CategoryTile
               key={tile.id}
               tile={tile}
               cards={tileCards}

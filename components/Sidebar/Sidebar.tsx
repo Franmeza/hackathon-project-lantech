@@ -1,112 +1,211 @@
 "use client";
 
-import { layout, sidebarNavButton, sidebarNavLabel, typography } from "@/lib/ui-tokens";
-import { LogOutButton } from "@/components/Auth/LogOutButton";
+import { useEffect, useRef, useState } from "react";
+import { Icon } from "@/components/ui/Icon";
+import { layout, sidebarLayout } from "@/lib/ui-tokens";
+import { ProfileMenu } from "@/components/Auth/ProfileMenu";
 
 export type ViewId = "inbox" | "archive";
+export type SidebarMode = "expanded" | "collapsed" | "expand-on-hover";
 
 interface SidebarProps {
   view: ViewId;
   onNavigate: (view: ViewId) => void;
   archiveCount: number;
+  userName?: string;
   userEmail?: string;
 }
 
-const InboxIcon = ({ active }: { active: boolean }) => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={active ? "#111827" : "#9CA3AF"}
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
-    <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" />
-  </svg>
-);
+const STORAGE_KEY = "sidebar-mode";
 
-const ArchiveIcon = ({ active }: { active: boolean }) => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={active ? "#111827" : "#9CA3AF"}
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="21 8 21 21 3 21 3 8" />
-    <rect x="1" y="3" width="22" height="5" />
-    <line x1="10" y1="12" x2="14" y2="12" />
-  </svg>
-);
-
-const NAV_ITEMS: { id: ViewId; label: string }[] = [
-  { id: "inbox", label: "Inbox" },
-  { id: "archive", label: "Archive" },
+const MODE_OPTIONS: { id: SidebarMode; label: string }[] = [
+  { id: "expanded", label: "Expanded" },
+  { id: "collapsed", label: "Collapsed" },
+  { id: "expand-on-hover", label: "Expand on hover" },
 ];
 
-function truncateEmail(email: string, max = 14): string {
-  if (email.length <= max) return email;
-  const at = email.indexOf("@");
-  if (at <= 0) return `${email.slice(0, max - 1)}…`;
-  const local = email.slice(0, at);
-  const domain = email.slice(at + 1);
-  const shortLocal =
-    local.length > 6 ? `${local.slice(0, 5)}…` : local;
-  return `${shortLocal}@${domain.split(".")[0]}…`;
+const NAV_ITEMS: { id: ViewId; label: string; icon: "inbox" | "archive" }[] = [
+  { id: "inbox", label: "Inbox", icon: "inbox" },
+  { id: "archive", label: "Archive", icon: "archive" },
+];
+
+function isValidMode(value: string | null): value is SidebarMode {
+  return value === "expanded" || value === "collapsed" || value === "expand-on-hover";
 }
 
 export function Sidebar({
   view,
   onNavigate,
   archiveCount,
+  userName,
   userEmail,
 }: SidebarProps) {
+  const [mode, setMode] = useState<SidebarMode>("expand-on-hover");
+  const [hoverExpanded, setHoverExpanded] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const controlRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (isValidMode(stored)) {
+      setMode(stored);
+    } else {
+      const legacy = localStorage.getItem("sidebar-collapsed");
+      if (legacy === "true") setMode("collapsed");
+      else if (legacy === "false") setMode("expanded");
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function handleClickOutside(e: MouseEvent) {
+      if (controlRef.current && !controlRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  function selectMode(next: SidebarMode) {
+    setMode(next);
+    localStorage.setItem(STORAGE_KEY, next);
+    setHoverExpanded(false);
+    setMenuOpen(false);
+  }
+
+  const isExpanded =
+    mode === "expanded" || (mode === "expand-on-hover" && hoverExpanded);
+
+  const widthClass = isExpanded
+    ? sidebarLayout.expandedWidth
+    : sidebarLayout.collapsedWidth;
+
+  const navSizeClass = isExpanded
+    ? sidebarLayout.navButtonExpanded
+    : sidebarLayout.navButtonCollapsed;
+
+  function handleMouseEnter() {
+    if (mode === "expand-on-hover") setHoverExpanded(true);
+  }
+
+  function handleMouseLeave() {
+    if (mode === "expand-on-hover" && !menuOpen && !profileMenuOpen) {
+      setHoverExpanded(false);
+    }
+  }
+
   return (
-    <aside className={layout.sidebar}>
-      <div className="flex flex-col items-center gap-1">
+    <aside
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={
+        layout.sidebar +
+        " " +
+        widthClass +
+        (hydrated ? "" : " " + sidebarLayout.expandedWidth)
+      }
+    >
+      <nav className={sidebarLayout.navList}>
         {NAV_ITEMS.map((item) => {
           const isActive = view === item.id;
+          const stateClass = isActive
+            ? sidebarLayout.navButtonActive
+            : sidebarLayout.navButtonInactive;
+          const labelClass = isActive
+            ? sidebarLayout.navLabelActive
+            : sidebarLayout.navLabelInactive;
+          const iconClass = isActive
+            ? sidebarLayout.navIconActive
+            : sidebarLayout.navIconInactive;
+
           return (
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              title={item.label}
-              className={isActive ? sidebarNavButton.active : sidebarNavButton.inactive}
+              title={!isExpanded ? item.label : undefined}
+              aria-label={item.label}
+              className={
+                sidebarLayout.navButtonBase +
+                " " +
+                navSizeClass +
+                " " +
+                stateClass
+              }
             >
-              {item.id === "inbox" ? (
-                <InboxIcon active={isActive} />
-              ) : (
-                <ArchiveIcon active={isActive} />
+              <Icon name={item.icon} size="md" className={iconClass} />
+              {isExpanded && (
+                <span className={sidebarLayout.navLabel + " " + labelClass}>
+                  {item.label}
+                </span>
               )}
-              <span className={isActive ? sidebarNavLabel.active : sidebarNavLabel.inactive}>
-                {item.label}
-              </span>
               {item.id === "archive" && archiveCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-gray-500 text-white text-[8px] font-bold flex items-center justify-center">
+                <span
+                  className={
+                    !isExpanded
+                      ? "absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-gray-500 text-white text-[8px] font-bold flex items-center justify-center"
+                      : "ml-auto text-[10px] font-semibold min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-gray-500 text-white flex items-center justify-center"
+                  }
+                >
                   {archiveCount > 9 ? "9+" : archiveCount}
                 </span>
               )}
             </button>
           );
         })}
-      </div>
+      </nav>
 
-      <div className="mt-auto mb-3 flex flex-col items-center gap-2 px-1">
-        {userEmail && (
-          <span
-            className={typography.sidebarLabel + " text-gray-400 text-center leading-tight max-w-full truncate"}
-            title={userEmail}
+      <div
+        className={
+          sidebarLayout.bottomBar +
+          (!isExpanded ? " " + sidebarLayout.bottomBarCollapsed : "")
+        }
+      >
+        <ProfileMenu
+          userName={userName}
+          userEmail={userEmail}
+          onOpenChange={setProfileMenuOpen}
+        />
+        <div ref={controlRef} className={sidebarLayout.controlWrapper}>
+          {menuOpen && (
+            <div className={sidebarLayout.controlMenu} role="menu">
+              <p className={sidebarLayout.controlMenuTitle}>Sidebar control</p>
+              {MODE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={mode === option.id}
+                  onClick={() => selectMode(option.id)}
+                  className={sidebarLayout.controlMenuItem}
+                >
+                  {mode === option.id ? (
+                    <span className={sidebarLayout.controlMenuDot} />
+                  ) : (
+                    <span className={sidebarLayout.controlMenuDotPlaceholder} />
+                  )}
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            title="Sidebar control"
+            aria-label="Sidebar control"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            className={sidebarLayout.toggleButton}
           >
-            {truncateEmail(userEmail)}
-          </span>
-        )}
-        <LogOutButton variant="icon" />
+            <Icon name="layout-sidebar" size="sm" />
+          </button>
+        </div>
       </div>
     </aside>
   );

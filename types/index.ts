@@ -35,10 +35,9 @@ export interface TileDefinition {
   id: string;
   label: string;
   subtitle: string;
-  cols: ColId[];           // which ColIds feed into this tile
-  accentTop: string;       // Tailwind border-t color class
-  countColor: string;      // Tailwind text color for the big count
-  icon: string;            // emoji icon
+  cols: ColId[];
+  accentTop: string;
+  countColor: string;
 }
 
 export interface ClassifyResult {

@@ -80,11 +80,27 @@ Never hardcode category colors (orange, red, violet, amber, gray for columns) ou
 | Layout shell | Page `bg-gray-50` + sidebar `bg-white border-gray-200` + main `flex-1 w-full px-10 py-8 max-w-6xl mx-auto` | `InboxBoard` |
 | Drop zone (active) | `min-h-44 rounded-xl p-0.5 border-2 border-dashed` + col `accent` + `bg` | `Column` |
 
+## Icons — Tabler only
+
+All UI icons use **[@tabler/icons-react](https://tabler.io/icons)** via `components/ui/Icon.tsx`.
+
+| Rule | Detail |
+|---|---|
+| Import path | `import { Icon, TileIcon } from "@/components/ui/Icon"` |
+| Direct Tabler imports | Forbidden outside `components/ui/Icon.tsx` |
+| Inline SVG | Forbidden in components — use `<Icon name="…" />` |
+| Emoji as icons | Forbidden — use Tabler via `<Icon>` |
+| Sizes | `xs` (12), `sm` (16), `md` (18), `lg` (20) from `iconSizes` in `lib/ui-tokens.ts` |
+| Stroke | Default `1.75` — match sidebar/nav weight |
+| Tile icons | Use `<TileIcon tileId="action|invoice|other|sub" />` |
+
+To add a new icon: register it in `IconName` and `ICON_MAP` inside `components/ui/Icon.tsx`.
+
 ## Shared primitives
 
 Prefer `components/ui/*` over duplicating class strings:
 
-- `DotIndicator`, `Pill`, `AiChip`, `Card`, `Button`, `EmptyState`, `ColumnHeader`
+- `DotIndicator`, `Pill`, `AiChip`, `Card`, `Button`, `EmptyState`, `ColumnHeader`, `Icon`, `TileIcon`
 
 Import tokens from `lib/ui-tokens.ts` for typography and functional color presets.
 
@@ -93,7 +109,8 @@ Import tokens from `lib/ui-tokens.ts` for typography and functional color preset
 1. **Dynamic Tailwind in className** — e.g. `` `hover:${cfg.border}` `` (Tailwind cannot compile these). Use static maps in `lib/ui-tokens.ts`.
 2. **Duplicated class strings** when a primitive exists in `components/ui/`.
 3. **Category colors outside `COL_CONFIG`** — report only; require user approval before changing.
-4. **Visual improvements** (dark mode, responsive redesign, extra a11y) — out of scope for this agent.
+4. **Icons outside Tabler** — no inline SVG, emoji icons, or direct `@tabler/icons-react` imports (use `components/ui/Icon`).
+5. **Visual improvements** (dark mode, responsive redesign, extra a11y) — out of scope for this agent.
 
 ## Known inconsistencies
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Card, ColConfigMap } from "@/types";
 import { Card as UiCard } from "@/components/ui/Card";
 import { DotIndicator } from "@/components/ui/DotIndicator";
+import { Icon } from "@/components/ui/Icon";
 import { Pill } from "@/components/ui/Pill";
 import { functionalColors, typography } from "@/lib/ui-tokens";
 
@@ -43,9 +44,10 @@ export function ArchiveCard({ card, colConfig, onRestore }: ArchiveCardProps) {
       {card.reply && (
         <button
           onClick={() => setReplyOpen((v) => !v)}
-          className={functionalColors.draftReply}
+          className={functionalColors.draftReply + " inline-flex items-center gap-1"}
         >
-          ✉ {replyOpen ? "Hide reply" : "Draft reply"}
+          <Icon name="message-reply" size="xs" />
+          {replyOpen ? "Hide reply" : "Draft reply"}
         </button>
       )}
 

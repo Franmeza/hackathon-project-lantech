@@ -193,6 +193,60 @@ function checkRawDot(file, content) {
   });
 }
 
+function checkRawSvg(file, content) {
+  if (!isOutsideUiDir(file)) return;
+  if (file.endsWith(`${UI_DIR}/Icon.tsx`) || file.endsWith("components/ui/Icon.tsx")) return;
+
+  const lines = content.split("\n");
+  lines.forEach((line, i) => {
+    if (line.includes("<svg") && !line.trim().startsWith("//")) {
+      addViolation(
+        file,
+        i + 1,
+        "raw-svg",
+        "Inline SVG — use <Icon> from components/ui/Icon with Tabler icons",
+        "warning"
+      );
+    }
+  });
+}
+
+function checkDirectTablerImport(file, content) {
+  if (file.endsWith(`${UI_DIR}/Icon.tsx`) || file.endsWith("components/ui/Icon.tsx")) return;
+  if (!content.includes("@tabler/icons-react")) return;
+
+  const lines = content.split("\n");
+  lines.forEach((line, i) => {
+    if (line.includes("@tabler/icons-react") && !line.trim().startsWith("//")) {
+      addViolation(
+        file,
+        i + 1,
+        "direct-tabler-import",
+        "Import Tabler icons only via components/ui/Icon",
+        "critical"
+      );
+    }
+  });
+}
+
+function checkEmojiIcons(file, content) {
+  if (!isOutsideUiDir(file)) return;
+  const emojiPattern =
+    /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2705}\u{2714}\u{2716}\u{2728}\u{274C}\u{2764}\u{2B50}\u{1F4E7}\u{1F514}\u{1F4C4}\u{1F4A1}\u{23F0}\u{2709}\u{2728}\u{2714}]/u;
+  const lines = content.split("\n");
+  lines.forEach((line, i) => {
+    if (emojiPattern.test(line) && !line.trim().startsWith("//")) {
+      addViolation(
+        file,
+        i + 1,
+        "emoji-icon",
+        "Emoji used as icon — use <Icon> from components/ui/Icon",
+        "warning"
+      );
+    }
+  });
+}
+
 // --- Run ---
 
 const files = SCAN_DIRS.flatMap((d) => walkDir(d));
@@ -206,6 +260,9 @@ for (const file of files) {
   checkColConfigBypass(file, content);
   checkDuplicateCardShell(file, content);
   checkRawDot(file, content);
+  checkRawSvg(file, content);
+  checkDirectTablerImport(file, content);
+  checkEmojiIcons(file, content);
 }
 
 const critical = violations.filter((v) => v.severity === "critical");

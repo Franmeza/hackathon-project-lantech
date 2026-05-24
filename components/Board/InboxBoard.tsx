@@ -8,8 +8,8 @@ import { ActionDetailView } from "@/components/Board/ActionDetailView";
 import { ArchiveView } from "@/components/Archive/ArchiveView";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { DashboardView } from "@/components/Dashboard/DashboardView";
+import { Icon, TileIcon, type TileIconId } from "@/components/ui/Icon";
 import { layout, typography, functionalColors } from "@/lib/ui-tokens";
-import { LogOutButton } from "@/components/Auth/LogOutButton";
 import type { Card, ColId } from "@/types";
 
 // Main nav: dashboard | archive
@@ -18,10 +18,11 @@ type MainView = "dashboard" | "archive";
 
 interface InboxBoardProps {
   initialCards?: Card[];
+  userName?: string;
   userEmail?: string;
 }
 
-export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
+export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProps) {
   const { cards: allCards, mutate } = useCards(initialCards);
   const [mainView, setMainView] = useState<MainView>("dashboard");
   const [detailTileId, setDetailTileId] = useState<string | null>(null);
@@ -120,6 +121,7 @@ export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
         view={sidebarView}
         onNavigate={handleSidebarNavigate}
         archiveCount={archivedCards.length}
+        userName={userName}
         userEmail={userEmail}
       />
 
@@ -140,7 +142,6 @@ export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
             activeCards={activeCards}
             onTileClick={handleTileClick}
             onExtracted={mutate}
-            userEmail={userEmail}
           />
         )}
 
@@ -148,28 +149,28 @@ export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
         {mainView === "dashboard" && detailTileId && detailTile && (
           <>
             {/* Header with back button */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleBackToDashboard}
-                  className="flex items-center gap-1.5 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
-                >
-                  ← Back
-                </button>
-                <span className="text-gray-300">/</span>
-                <span className="text-xl">{detailTile.icon}</span>
-                <h1 className={typography.pageTitle}>{detailTile.label}</h1>
-                <span
-                  className={
-                    detailTile.id === "action"
-                      ? functionalColors.emailCount
-                      : functionalColors.detailEmailCountDefault
-                  }
-                >
-                  {detailCards.length} emails
-                </span>
-              </div>
-              <LogOutButton />
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={handleBackToDashboard}
+                className="flex items-center gap-1.5 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <Icon name="chevron-left" size="sm" />
+                Back
+              </button>
+              <span className="text-gray-300">/</span>
+              <span className="flex items-center">
+                <TileIcon tileId={detailTileId as TileIconId} size="md" className="text-gray-700" />
+              </span>
+              <h1 className={typography.pageTitle}>{detailTile.label}</h1>
+              <span
+                className={
+                  detailTile.id === "action"
+                    ? functionalColors.emailCount
+                    : functionalColors.detailEmailCountDefault
+                }
+              >
+                {detailCards.length} emails
+              </span>
             </div>
 
             {/* Column layout — Action Required gets 3 semantic columns */}
