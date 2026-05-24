@@ -13,8 +13,8 @@ interface SidebarProps {
 
 const InboxIcon = ({ active }: { active: boolean }) => (
   <svg
-    width="18"
-    height="18"
+    width="16"
+    height="16"
     viewBox="0 0 24 24"
     fill="none"
     stroke={active ? "#111827" : "#9CA3AF"}
@@ -29,8 +29,8 @@ const InboxIcon = ({ active }: { active: boolean }) => (
 
 const ArchiveIcon = ({ active }: { active: boolean }) => (
   <svg
-    width="18"
-    height="18"
+    width="16"
+    height="16"
     viewBox="0 0 24 24"
     fill="none"
     stroke={active ? "#111827" : "#9CA3AF"}
@@ -49,15 +49,24 @@ const NAV_ITEMS: { id: ViewId; label: string }[] = [
   { id: "archive", label: "Archive" },
 ];
 
-function truncateEmail(email: string, max = 14): string {
-  if (email.length <= max) return email;
-  const at = email.indexOf("@");
-  if (at <= 0) return `${email.slice(0, max - 1)}…`;
-  const local = email.slice(0, at);
-  const domain = email.slice(at + 1);
-  const shortLocal =
-    local.length > 6 ? `${local.slice(0, 5)}…` : local;
-  return `${shortLocal}@${domain.split(".")[0]}…`;
+function getInitials(email: string): string {
+  const local = email.split("@")[0] ?? "?";
+  return local.charAt(0).toUpperCase();
+}
+
+function getAvatarBg(email: string): string {
+  const palette = [
+    "#7C3AED", // violet
+    "#2563EB", // blue
+    "#059669", // emerald
+    "#D97706", // amber
+    "#DC2626", // rose
+    "#4F46E5", // indigo
+    "#0D9488", // teal
+  ];
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) hash = (hash * 31 + email.charCodeAt(i)) >>> 0;
+  return palette[hash % palette.length];
 }
 
 export function Sidebar({
@@ -66,9 +75,35 @@ export function Sidebar({
   archiveCount,
   userEmail,
 }: SidebarProps) {
+  const avatarBg = userEmail ? getAvatarBg(userEmail) : "#6B7280";
+  const initials = userEmail ? getInitials(userEmail) : "?";
+
   return (
-    <aside className="w-14 flex-shrink-0 flex flex-col items-center pt-2 gap-1 border-r border-gray-100 min-h-screen">
-      <div className="flex flex-col items-center gap-1">
+    <aside className="w-[60px] flex-shrink-0 flex flex-col items-center py-3 gap-0 border-r border-gray-100 sticky top-0 h-screen bg-white">
+      {/* Logo mark */}
+      <div className="mb-4 mt-1">
+        <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+            <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="w-6 h-px bg-gray-100 mb-3" />
+
+      {/* Nav items */}
+      <div className="flex flex-col items-center gap-1 w-full px-2">
         {NAV_ITEMS.map((item) => {
           const isActive = view === item.id;
           return (
@@ -76,9 +111,9 @@ export function Sidebar({
               key={item.id}
               onClick={() => onNavigate(item.id)}
               title={item.label}
-              className={`relative w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-colors ${
+              className={`relative w-full h-9 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all ${
                 isActive
-                  ? "bg-gray-100"
+                  ? "bg-gray-100 shadow-inner"
                   : "bg-transparent hover:bg-gray-50"
               }`}
             >
@@ -88,14 +123,14 @@ export function Sidebar({
                 <ArchiveIcon active={isActive} />
               )}
               <span
-                className={`text-[9px] font-medium leading-none ${
-                  isActive ? "text-gray-900 font-semibold" : "text-gray-400"
+                className={`text-[8.5px] font-semibold leading-none ${
+                  isActive ? "text-gray-900" : "text-gray-400"
                 }`}
               >
                 {item.label}
               </span>
               {item.id === "archive" && archiveCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-gray-500 text-white text-[8px] font-bold flex items-center justify-center">
+                <span className="absolute top-1 right-1.5 min-w-[14px] h-3.5 rounded-full bg-gray-500 text-white text-[7px] font-bold flex items-center justify-center px-0.5">
                   {archiveCount > 9 ? "9+" : archiveCount}
                 </span>
               )}
@@ -104,14 +139,20 @@ export function Sidebar({
         })}
       </div>
 
-      <div className="mt-auto mb-3 flex flex-col items-center gap-2 px-1">
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* User + logout */}
+      <div className="flex flex-col items-center gap-2 px-2 mb-2 w-full">
+        {/* User avatar */}
         {userEmail && (
-          <span
-            className="text-[8px] text-gray-400 text-center leading-tight max-w-full truncate"
+          <div
             title={userEmail}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0 cursor-default"
+            style={{ backgroundColor: avatarBg }}
           >
-            {truncateEmail(userEmail)}
-          </span>
+            {initials}
+          </div>
         )}
         <LogOutButton variant="icon" />
       </div>

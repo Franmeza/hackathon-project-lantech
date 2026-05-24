@@ -35,14 +35,35 @@ export function EmailCard({
   onDragEnd,
   onArchive,
 }: EmailCardProps) {
-  const [replyOpen, setReplyOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const cfg = colConfig[card.col];
+  const [replyOpen, setReplyOpen]       = useState(false);
+  const [draft, setDraft]               = useState<string | null>(card.reply);
+  const [generating, setGenerating]     = useState(false);
+  const [genError, setGenError]         = useState<string | null>(null);
+  const [copied, setCopied]             = useState(false);
+  const [hovered, setHovered]           = useState(false);
 
-  function copyReply() {
-    if (!card.reply) return;
-    navigator.clipboard.writeText(card.reply).catch(() => {});
+  const cfg = colConfig[card.col];
+  const isActionable = card.col === "action" || card.col === "overdue";
+
+  async function generateDraft() {
+    setGenerating(true);
+    setGenError(null);
+    try {
+      const res = await fetch(`/api/cards/${card.id}/draft`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to generate draft");
+      const data = (await res.json()) as { reply: string };
+      setDraft(data.reply);
+      setReplyOpen(true);
+    } catch {
+      setGenError("Could not generate draft. Try again.");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function copyDraft() {
+    if (!draft) return;
+    navigator.clipboard.writeText(draft).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
@@ -74,15 +95,9 @@ export function EmailCard({
       )}
 
       {/* Header */}
-      <div
-        className={`flex justify-between items-start mb-1.5 ${
-          hovered ? "pr-16" : ""
-        }`}
-      >
+      <div className={`flex justify-between items-start mb-1.5 ${hovered ? "pr-16" : ""}`}>
         <span className="flex items-center gap-1.5 text-xs font-semibold text-gray-900">
-          <span
-            className={`w-2 h-2 rounded-full flex-shrink-0 inline-block ${cfg.dot}`}
-          />
+          <span className={`w-2 h-2 rounded-full flex-shrink-0 inline-block ${cfg.dot}`} />
           {card.sender}
         </span>
         <span className="text-[11px] text-gray-400 whitespace-nowrap ml-2">
@@ -91,9 +106,7 @@ export function EmailCard({
       </div>
 
       {/* Task */}
-      <p className="text-[13px] text-gray-800 leading-snug mb-1.5">
-        {card.task}
-      </p>
+      <p className="text-[13px] text-gray-800 leading-snug mb-1.5">{card.task}</p>
 
       {/* AI reason chip */}
       <div className="flex gap-1 items-start text-[11px] text-gray-500 bg-gray-50 border border-gray-100 rounded-md px-2 py-1 mb-2">
@@ -101,33 +114,66 @@ export function EmailCard({
         {card.reason}
       </div>
 
-      {/* Badges */}
-      <div className="flex gap-1.5 flex-wrap">
+      {/* Badges row */}
+      <div className="flex gap-1.5 flex-wrap items-center">
         {card.deadline && (
           <span className="text-[11px] px-2 py-0.5 rounded-full border border-yellow-200 bg-yellow-50 text-yellow-800 flex items-center gap-1">
             ⏰ {card.deadline}
           </span>
         )}
-        {card.reply && (
+
+        {/* Draft reply button — only for actionable emails */}
+        {isActionable && !draft && (
+          <button
+            onClick={generateDraft}
+            disabled={generating}
+            className="flex items-center gap-1.5 text-[11px] px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors disabled:opacity-60"
+          >
+            {generating ? (
+              <>
+                <span className="w-2.5 h-2.5 rounded-full border-2 border-blue-400 border-t-transparent animate-spin inline-block" />
+                Writing…
+              </>
+            ) : (
+              <>✉ Generate draft</>
+            )}
+          </button>
+        )}
+
+        {draft && (
           <button
             onClick={() => setReplyOpen((v) => !v)}
-            className="text-[11px] px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100 transition-colors"
+            className="text-[11px] px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
           >
-            ✉ {replyOpen ? "Hide reply" : "Draft reply"}
+            ✉ {replyOpen ? "Hide draft" : "View draft"}
           </button>
         )}
       </div>
 
-      {/* Draft reply panel */}
-      {replyOpen && card.reply && (
-        <div className="mt-2 text-xs text-gray-700 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2 leading-relaxed">
-          {card.reply}
-          <button
-            onClick={copyReply}
-            className="mt-1.5 block text-[11px] px-2 py-0.5 rounded-full border border-green-200 text-green-700 hover:bg-green-100 transition-colors"
-          >
-            {copied ? "Copied!" : "Copy"}
-          </button>
+      {/* Gen error */}
+      {genError && (
+        <p className="text-[11px] text-red-500 mt-1.5">{genError}</p>
+      )}
+
+      {/* Draft panel */}
+      {replyOpen && draft && (
+        <div className="mt-2.5 text-xs text-gray-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 leading-relaxed whitespace-pre-wrap">
+          {draft}
+          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-blue-100">
+            <button
+              onClick={copyDraft}
+              className="text-[11px] px-2 py-0.5 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors"
+            >
+              {copied ? "Copied!" : "Copy"}
+            </button>
+            <button
+              onClick={generateDraft}
+              disabled={generating}
+              className="text-[11px] px-2 py-0.5 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              {generating ? "Regenerating…" : "Regenerate"}
+            </button>
+          </div>
         </div>
       )}
     </div>

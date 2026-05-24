@@ -9,10 +9,8 @@ import { ArchiveView } from "@/components/Archive/ArchiveView";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { DashboardView } from "@/components/Dashboard/DashboardView";
 import { LogOutButton } from "@/components/Auth/LogOutButton";
+import { RightPanel } from "@/components/RightPanel/RightPanel";
 import type { Card, ColId } from "@/types";
-
-// Main nav: dashboard | archive
-// Detail nav: the tile id clicked (maps to a TILE_DEFINITION)
 type MainView = "dashboard" | "archive";
 
 interface InboxBoardProps {
@@ -113,8 +111,8 @@ export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
   const sidebarView = mainView === "archive" ? "archive" : "inbox";
 
   return (
-    <div className="flex gap-0 min-h-screen w-full font-sans">
-      {/* Sidebar — left */}
+    <div className="flex min-h-screen w-full font-sans">
+      {/* Left nav sidebar */}
       <Sidebar
         view={sidebarView}
         onNavigate={handleSidebarNavigate}
@@ -123,7 +121,7 @@ export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
       />
 
       {/* Main content */}
-      <div className="flex-1 min-w-0 px-10 py-8 max-w-4xl">
+      <div className="flex-1 min-w-0 px-8 py-8">
         {/* ── Archive view ── */}
         {mainView === "archive" && (
           <ArchiveView
@@ -151,17 +149,20 @@ export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleBackToDashboard}
-                  className="flex items-center gap-1.5 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
+                  className="flex items-center gap-1.5 text-[12px] font-medium text-gray-400 hover:text-gray-700 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-gray-100"
                 >
-                  ← Back
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7.5 1.5L3 6l4.5 4.5"/>
+                  </svg>
+                  Back
                 </button>
-                <span className="text-gray-300">/</span>
+                <span className="text-gray-200">/</span>
                 <span className="text-xl">{detailTile.icon}</span>
-                <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
+                <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">
                   {detailTile.label}
                 </h1>
-                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${detailTile.id === "action" ? "border-red-200 bg-red-50 text-red-800" : "border-gray-200 bg-gray-50 text-gray-600"}`}>
-                  {detailCards.length} emails
+                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${detailTile.id === "action" ? "border-red-200 bg-red-50 text-red-700" : "border-gray-200 bg-gray-100 text-gray-600"}`}>
+                  {detailCards.length}
                 </span>
               </div>
               <LogOutButton />
@@ -202,6 +203,11 @@ export function InboxBoard({ initialCards, userEmail }: InboxBoardProps) {
           </>
         )}
       </div>
+
+      {/* Right AI insights panel — only on dashboard overview */}
+      {mainView === "dashboard" && !detailTileId && (
+        <RightPanel cards={activeCards} />
+      )}
     </div>
   );
 }
