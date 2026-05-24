@@ -1,41 +1,45 @@
+import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { InboxBoard } from "@/components/Board/InboxBoard";
-import { PLACEHOLDER_CARDS } from "@/lib/placeholder-cards";
 import type { Card } from "@/types";
+import { redirect } from "next/navigation";
 
-async function getInitialCards(): Promise<Card[]> {
-  try {
-    const cards = await prisma.card.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    const mapped = cards.map((c) => ({
-      id: c.id,
-      col: c.col as Card["col"],
-      sender: c.sender,
-      senderType: c.senderType as Card["senderType"],
-      time: c.time,
-      task: c.task,
-      reason: c.reason,
-      deadline: c.deadline,
-      reply: c.reply,
-      archived: c.archived,
-      gmailMsgId: c.gmailMsgId,
-      createdAt: c.createdAt.toISOString(),
-    }));
-    // Show placeholder cards when the database has no real data yet
-    return mapped.length > 0 ? mapped : PLACEHOLDER_CARDS;
-  } catch {
-    // DB not yet connected — show placeholder cards so the UI is usable
-    return PLACEHOLDER_CARDS;
-  }
+async function getUserCards(userId: string): Promise<Card[]> {
+  const cards = await prisma.card.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return cards.map((c) => ({
+    id: c.id,
+    col: c.col as Card["col"],
+    sender: c.sender,
+    senderType: c.senderType as Card["senderType"],
+    time: c.time,
+    task: c.task,
+    reason: c.reason,
+    deadline: c.deadline,
+    reply: c.reply,
+    archived: c.archived,
+    gmailMsgId: c.gmailMsgId,
+    createdAt: c.createdAt.toISOString(),
+  }));
 }
 
 export default async function HomePage() {
-  const initialCards = await getInitialCards();
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/sign-in");
+  }
+
+  const initialCards = await getUserCards(session.user.id);
 
   return (
     <main className="min-h-screen bg-white flex">
-      <InboxBoard initialCards={initialCards} />
+      <InboxBoard
+        initialCards={initialCards}
+        userEmail={session.user.email ?? undefined}
+      />
     </main>
   );
 }
