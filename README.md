@@ -173,9 +173,8 @@ No third-party email datasets were used — classification runs on the signed-in
 ## Limitations
 
 - **Gmail only** — no Outlook, Apple Mail, or other providers
-- **New mail after connect** — existing inbox history is not backfilled on sign-in
+- **New mail after connect** — existing inbox history is not backfilled on sign-in (this is intended)
 - **Push webhook requires a public URL** — local Gmail ingestion needs ngrok or similar; Paste Message works without it
-- **Classification accuracy** — GPT-5-mini is good but not perfect; hybrid emails (e.g. invoice + action) may land in the wrong column
 - **No send from app** — replies open in Gmail; the OAuth scope is read + trash only
 - **Token refresh / watch renewal** — if OAuth refresh fails or the 7-day Gmail watch expires, ingestion pauses until re-authentication or manual watch re-registration (`/api/debug/register-watch`)
 
@@ -187,10 +186,6 @@ No third-party email datasets were used — classification runs on the signed-in
 - Slack / Teams integration alongside Gmail
 - Confidence score on AI classification with manual override history fed back as few-shot examples
 - Inbox backfill on first connect
-
-## Screenshots
-
-> Add 2–3 captures before portal submission (dashboard overview, Action Required board, message modal with draft reply). Suggested paths: `docs/screenshots/dashboard.png`, `docs/screenshots/action-board.png`, `docs/screenshots/message-modal.png`.
 
 ## Project Structure
 
@@ -240,31 +235,7 @@ No third-party email datasets were used — classification runs on the signed-in
 
 **Smart Inbox**
 
-### Description
 
-```text
-Smart Inbox is an AI-powered email triage assistant for busy professionals that helps them turn an overwhelming Gmail inbox into a prioritized action board with summaries and draft replies.
-
-In the demo, users can sign in with Google, see emails auto-sorted into Action Required / Invoices / Subscriptions / FYI, drag cards between deadline columns, open full messages, and copy AI draft replies. We focused on a real-time Gmail → Pub/Sub → GPT-5-mini → Supabase pipeline and built a working vertical slice that shows how much time you save when only actionable mail surfaces first.
-
-Tech stack: Next.js, TypeScript, Tailwind, NextAuth, Gmail API, Google Pub/Sub, OpenAI GPT-5-mini, Prisma, Supabase, Vercel.
 ```
 
-### GitHub repo URL
 
-Set your public repo URL before submitting (e.g. `https://github.com/YOUR_ORG/smart-inbox`).
-
----
-
-## Submission Checklist
-
-- [ ] Repo is public
-- [x] README is clear
-- [x] App runs from documented instructions
-- [x] Demo path is described
-- [x] Tech stack listed
-- [x] External APIs/libraries credited
-- [x] Known limitations included
-- [ ] Screenshots added under `docs/screenshots/`
-- [x] No secrets/API keys committed (use `.env.local` only; see `.env.local.example`)
-- [ ] Commit history is reasonable
