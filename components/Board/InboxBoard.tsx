@@ -7,7 +7,6 @@ import { Column } from "@/components/Board/Column";
 import { ActionDetailView } from "@/components/Board/ActionDetailView";
 import { ArchiveView } from "@/components/Archive/ArchiveView";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { PasteMessage } from "@/components/PasteMessage/PasteMessage";
 import { DashboardView } from "@/components/Dashboard/DashboardView";
 import type { Card, ColId } from "@/types";
 
@@ -136,6 +135,7 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
           <DashboardView
             activeCards={activeCards}
             onTileClick={handleTileClick}
+            onExtracted={mutate}
           />
         )}
 
@@ -160,7 +160,6 @@ export function InboxBoard({ initialCards }: InboxBoardProps) {
                   {detailCards.length} emails
                 </span>
               </div>
-              <PasteMessage onExtracted={mutate} />
             </div>
 
             {/* Column layout — Action Required gets 3 semantic columns */}

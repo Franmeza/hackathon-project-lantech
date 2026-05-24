@@ -4,9 +4,10 @@ import { useState } from "react";
 
 interface PasteMessageProps {
   onExtracted: () => void;
+  fullWidth?: boolean;
 }
 
-export function PasteMessage({ onExtracted }: PasteMessageProps) {
+export function PasteMessage({ onExtracted, fullWidth = false }: PasteMessageProps) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,13 +38,15 @@ export function PasteMessage({ onExtracted }: PasteMessageProps) {
   }
 
   return (
-    <div>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-      >
-        ✦ Paste message
-      </button>
+    <div className={fullWidth ? "w-full" : undefined}>
+      <div className={fullWidth ? "flex justify-end" : undefined}>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+        >
+          ✦ Paste message
+        </button>
+      </div>
 
       {open && (
         <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-xl">

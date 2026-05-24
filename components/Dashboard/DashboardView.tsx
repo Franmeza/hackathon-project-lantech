@@ -3,10 +3,12 @@
 import type { Card } from "@/types";
 import { TILE_DEFINITIONS } from "@/lib/col-config";
 import { SummaryTile } from "@/components/Dashboard/SummaryTile";
+import { PasteMessage } from "@/components/PasteMessage/PasteMessage";
 
 interface DashboardViewProps {
   activeCards: Card[];
   onTileClick: (tileId: string) => void;
+  onExtracted: () => void;
 }
 
 function getGreeting(): string {
@@ -16,12 +18,11 @@ function getGreeting(): string {
   return "Good evening";
 }
 
-export function DashboardView({ activeCards, onTileClick }: DashboardViewProps) {
+export function DashboardView({ activeCards, onTileClick, onExtracted }: DashboardViewProps) {
   const totalEmails = activeCards.length;
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Header — same style as the existing board header */}
+    <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
@@ -38,8 +39,10 @@ export function DashboardView({ activeCards, onTileClick }: DashboardViewProps) 
         </span>
       </div>
 
+      <PasteMessage onExtracted={onExtracted} fullWidth />
+
       {/* 2×2 tile grid */}
-      <div className="grid grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-2 gap-3.5 mt-2">
         {TILE_DEFINITIONS.map((tile) => {
           const tileCards = activeCards.filter((c) =>
             tile.cols.includes(c.col)
