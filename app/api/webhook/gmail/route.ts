@@ -86,7 +86,8 @@ async function processNotification(body: PubSubMessage): Promise<void> {
     const messageIds = await getNewMessageIds(
       startHistoryId,
       tokens.accessToken,
-      tokens.refreshToken ?? undefined
+      tokens.refreshToken ?? undefined,
+      user.id
     );
 
     // Process each new message
@@ -101,7 +102,8 @@ async function processNotification(body: PubSubMessage): Promise<void> {
         const email = await fetchGmailMessage(
           msgId,
           tokens.accessToken,
-          tokens.refreshToken ?? undefined
+          tokens.refreshToken ?? undefined,
+          user.id
         );
 
         const classification = await classifyEmail(

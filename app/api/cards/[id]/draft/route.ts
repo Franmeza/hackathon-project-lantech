@@ -36,7 +36,8 @@ export async function POST(
         const email = await fetchGmailMessage(
           card.gmailMsgId,
           tokens.accessToken,
-          tokens.refreshToken ?? undefined
+          tokens.refreshToken ?? undefined,
+          session.user.id
         );
         from = email.from;
         subject = email.subject;
