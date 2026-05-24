@@ -24,20 +24,39 @@ export function EmailCard({
   onArchive,
 }: EmailCardProps) {
   const [replyOpen, setReplyOpen] = useState(false);
+  const [draft, setDraft] = useState<string | null>(card.reply);
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const cfg = colConfig[card.col];
 
-  function copyReply() {
-    if (!card.reply) return;
-    navigator.clipboard.writeText(card.reply).catch(() => {});
+  const cfg = colConfig[card.col];
+  const isActionable = card.col === "action" || card.col === "overdue";
+
+  async function generateDraft() {
+    setGenerating(true);
+    setGenError(null);
+    try {
+      const res = await fetch(`/api/cards/${card.id}/draft`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to generate draft");
+      const data = (await res.json()) as { reply: string };
+      setDraft(data.reply);
+      setReplyOpen(true);
+    } catch {
+      setGenError("Could not generate draft. Try again.");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function copyDraft() {
+    if (!draft) return;
+    navigator.clipboard.writeText(draft).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
 
-  const borderClass = hovered
-    ? cardHoverBorderByCol[card.col]
-    : "border-gray-200";
+  const borderClass = hovered ? cardHoverBorderByCol[card.col] : "border-gray-200";
 
   return (
     <UiCard
@@ -81,30 +100,65 @@ export function EmailCard({
 
       <AiChip className="mb-2">{card.reason}</AiChip>
 
-      <div className="flex gap-1.5 flex-wrap">
+      <div className="flex gap-1.5 flex-wrap items-center">
         {card.deadline && (
           <span className={functionalColors.deadline + " flex items-center gap-1"}>
             <Icon name="clock" size="xs" />
             {card.deadline}
           </span>
         )}
-        {card.reply && (
+
+        {isActionable && !draft && (
+          <button
+            onClick={generateDraft}
+            disabled={generating}
+            className="flex items-center gap-1.5 text-[11px] px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors disabled:opacity-60"
+          >
+            {generating ? (
+              <>
+                <span className="w-2.5 h-2.5 rounded-full border-2 border-blue-400 border-t-transparent animate-spin inline-block" />
+                Writing…
+              </>
+            ) : (
+              <>
+                <Icon name="message-reply" size="xs" />
+                Generate draft
+              </>
+            )}
+          </button>
+        )}
+
+        {draft && (
           <button
             onClick={() => setReplyOpen((v) => !v)}
             className={functionalColors.draftReply + " inline-flex items-center gap-1"}
           >
             <Icon name="message-reply" size="xs" />
-            {replyOpen ? "Hide reply" : "Draft reply"}
+            {replyOpen ? "Hide draft" : "View draft"}
           </button>
         )}
       </div>
 
-      {replyOpen && card.reply && (
-        <div className={functionalColors.replyPanel}>
-          {card.reply}
-          <button onClick={copyReply} className={functionalColors.copyButton}>
-            {copied ? "Copied!" : "Copy"}
-          </button>
+      {genError && <p className={functionalColors.errorText}>{genError}</p>}
+
+      {replyOpen && draft && (
+        <div className="mt-2.5 text-xs text-gray-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 leading-relaxed whitespace-pre-wrap">
+          {draft}
+          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-blue-100">
+            <button
+              onClick={copyDraft}
+              className="text-[11px] px-2 py-0.5 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors"
+            >
+              {copied ? "Copied!" : "Copy"}
+            </button>
+            <button
+              onClick={generateDraft}
+              disabled={generating}
+              className="text-[11px] px-2 py-0.5 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              {generating ? "Regenerating…" : "Regenerate"}
+            </button>
+          </div>
         </div>
       )}
     </UiCard>

@@ -9,11 +9,10 @@ import { ArchiveView } from "@/components/Archive/ArchiveView";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { DashboardView } from "@/components/Dashboard/DashboardView";
 import { Icon, TileIcon, type TileIconId } from "@/components/ui/Icon";
+import { RightPanel } from "@/components/RightPanel/RightPanel";
 import { layout, typography, functionalColors } from "@/lib/ui-tokens";
 import type { Card, ColId } from "@/types";
 
-// Main nav: dashboard | archive
-// Detail nav: the tile id clicked (maps to a TILE_DEFINITION)
 type MainView = "dashboard" | "archive";
 
 interface InboxBoardProps {
@@ -32,13 +31,10 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
   const activeCards = allCards.filter((c) => !c.archived);
   const archivedCards = allCards.filter((c) => c.archived);
 
-  // Resolve which ColIds belong to the open detail tile
   const detailTile = TILE_DEFINITIONS.find((t) => t.id === detailTileId) ?? null;
   const detailCards = detailTile
     ? activeCards.filter((c) => detailTile.cols.includes(c.col))
     : [];
-
-  // ── Drag and drop ──────────────────────────────────────────────────────────
 
   function onDragStart(e: React.DragEvent, id: string) {
     draggingId.current = id;
@@ -74,8 +70,6 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     mutate();
   }
 
-  // ── Archive / restore ──────────────────────────────────────────────────────
-
   async function handleArchive(id: string) {
     await fetch("/api/cards", {
       method: "PATCH",
@@ -94,8 +88,6 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     mutate();
   }
 
-  // ── Navigation helpers ─────────────────────────────────────────────────────
-
   function handleTileClick(tileId: string) {
     setDetailTileId(tileId);
   }
@@ -110,13 +102,10 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
     setMainView(view === "inbox" ? "dashboard" : "archive");
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
-
   const sidebarView = mainView === "archive" ? "archive" : "inbox";
 
   return (
-    <div className="flex gap-0 min-h-screen w-full font-sans">
-      {/* Sidebar — left */}
+    <div className="flex min-h-screen w-full font-sans">
       <Sidebar
         view={sidebarView}
         onNavigate={handleSidebarNavigate}
@@ -125,9 +114,7 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
         userEmail={userEmail}
       />
 
-      {/* Main content */}
       <div className={layout.mainContent}>
-        {/* ── Archive view ── */}
         {mainView === "archive" && (
           <ArchiveView
             archived={archivedCards}
@@ -136,19 +123,17 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
           />
         )}
 
-        {/* ── Dashboard view ── */}
         {mainView === "dashboard" && !detailTileId && (
           <DashboardView
             activeCards={activeCards}
             onTileClick={handleTileClick}
             onExtracted={mutate}
+            userEmail={userEmail}
           />
         )}
 
-        {/* ── Column detail view ── */}
         {mainView === "dashboard" && detailTileId && detailTile && (
           <>
-            {/* Header with back button */}
             <div className="flex items-center gap-3 mb-6">
               <button
                 onClick={handleBackToDashboard}
@@ -173,7 +158,6 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
               </span>
             </div>
 
-            {/* Column layout — Action Required gets 3 semantic columns */}
             {detailTileId === "action" ? (
               <ActionDetailView
                 cards={detailCards}
@@ -210,6 +194,10 @@ export function InboxBoard({ initialCards, userName, userEmail }: InboxBoardProp
           </>
         )}
       </div>
+
+      {mainView === "dashboard" && !detailTileId && (
+        <RightPanel cards={activeCards} />
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ Professionals spend 28% of their workweek managing email. The cognitive load of 
 
 ## Solution
 
-Inbox Action Board connects to your Gmail account and automatically classifies every incoming email using GPT-4o. Emails are grouped into four categories on a visual dashboard:
+Inbox Action Board connects to your Gmail account and automatically classifies every incoming email using GPT-5-mini. Emails are grouped into four categories on a visual dashboard:
 
 | Category | What it means |
 |---|---|
@@ -45,7 +45,7 @@ Within Action Required, emails are further sorted into **Overdue**, **Today**, a
 | Styling | Tailwind CSS |
 | Auth | NextAuth v5 — Google OAuth with `gmail.readonly` scope |
 | Email pipeline | Gmail API + Google Cloud Pub/Sub (push webhooks) |
-| AI classification | OpenAI GPT-4o with JSON mode |
+| AI classification | OpenAI GPT-5-mini with JSON mode |
 | Database | Prisma ORM + Supabase (PostgreSQL) |
 | Data fetching | SWR — polls `/api/cards` every 15 seconds |
 | Deployment | Vercel |
@@ -63,7 +63,7 @@ POST /api/webhook/gmail
     │
     ├─► Gmail API — fetch full message body
     │
-    ├─► OpenAI GPT-4o — classify into col + task + reason + deadline + draft reply
+    ├─► OpenAI GPT-5-mini — classify into col + task + reason + deadline + draft reply
     │
     └─► Supabase (PostgreSQL) — upsert Card row
               │
@@ -93,7 +93,7 @@ POST /api/webhook/gmail
 │   ├── Sidebar/     Sidebar
 │   └── PasteMessage/
 ├── lib/
-│   ├── openai.ts    classifyEmail() — GPT-4o with structured JSON output
+│   ├── openai.ts    classifyEmail() — GPT-5-mini with structured JSON output
 │   ├── gmail.ts     fetchMessage, registerWatch, getNewMessageIds
 │   ├── db.ts        Prisma singleton
 │   └── col-config.ts  column + tile definitions
@@ -156,7 +156,7 @@ npm run dev
 - **Gmail only** — no Outlook, Apple Mail, or other providers
 - **Sign-in at `/sign-in`** — Google OAuth; only new emails after connect are processed (no inbox import)
 - **Push webhook requires public URL** — local development needs ngrok or a similar tunnel for real email ingestion; the Paste Message feature works locally without it
-- **Classification accuracy** — GPT-4o is good but not perfect; edge cases (e.g. hybrid action/invoice emails) may land in the wrong column
+- **Classification accuracy** — GPT-5-mini is good but not perfect; edge cases (e.g. hybrid action/invoice emails) may land in the wrong column
 - **No token refresh handling** — if the OAuth access token expires and refresh fails, email ingestion pauses until the user re-authenticates
 
 ---

@@ -9,8 +9,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Inbox Action Board",
-  description: "AI-powered Gmail inbox triage — built with Next.js",
+  title: "Inbox AI — Gmail triage, automated",
+  description: "AI reads every new Gmail and routes it to action items, invoices, subscriptions, or FYI. Built with Next.js and GPT-5-mini.",
 };
 
 export default function RootLayout({
